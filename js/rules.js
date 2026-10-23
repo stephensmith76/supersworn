@@ -53,15 +53,16 @@ export const RESULT_LABEL = { strong: 'Strong hit', weak: 'Weak hit', miss: 'Mis
 export const ODDS = [
   ['Almost certain', 90], ['Likely', 75], ['50/50', 50], ['Unlikely', 25], ['Small chance', 10],
 ];
-export function askOracle(chance) {
-  const r = rnd(100);
+export function askOracle(chance, forced) {
+  const r = forced || rnd(100);
   return { kind: 'yesno', roll: r, chance, yes: r <= chance, match: r % 11 === 0 };
 }
 
 // Oracle rolling. Rows are [min, max, text]; text starting with '@' points at another table.
-export function rollOracle(table, byId, depth = 0) {
+export function rollOracle(table, byId, depth = 0, forced) {
   let roll;
-  if (table.dice === '2d10') roll = rnd(10) + rnd(10);
+  if (forced) roll = forced;
+  else if (table.dice === '2d10') roll = rnd(10) + rnd(10);
   else roll = rnd(100);
   const row = table.rows.find(r => roll >= r[0] && roll <= r[1]);
   let text = row ? row[2] : '?';

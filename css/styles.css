@@ -241,3 +241,15 @@ input, select, textarea, .field input, .form select { font-size: 16px; }
 .camp.current, .card.camp.current { border-color: var(--accent); }
 .entry.k-session { border-left-color: var(--strong); }
 .entry.k-recap { border-left-color: var(--accent); background: var(--surface2); }
+/* physical dice */
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.seg button { background: none; border: 0; padding: 8px 12px; min-height: 38px; color: var(--muted); cursor: pointer; font-size: 14px; }
+.seg button.on { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.dicepick { margin: 10px 0; }
+.dicepick .lbl { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+.dicerow { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+.dicerow.n6 { grid-template-columns: repeat(6, 1fr); }
+.die { min-height: 40px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); font: 20px/1 var(--display); cursor: pointer; padding: 0; }
+.die.on { background: var(--text); color: var(--bg); border-color: var(--text); }
+.d100 input { max-width: 140px; }
+.chip:disabled { opacity: .4; }

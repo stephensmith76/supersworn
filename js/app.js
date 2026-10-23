@@ -42,7 +42,22 @@ async function loadData() {
 const ui = {
   tab: 'heroes', heroId: null, modal: null, lastRoll: null, oracleResults: [], moveId: '', rollStat: 'iron',
   rollAdds: 0, rollHero: null, moveQuery: '', oracleQuery: '', assetQuery: '', pendingRender: false, drafts: {},
+  manual: {}, d100: '',
 };
+const physical = () => store.prefs.physical === '1';
+function dicePicker(label, key, max) {
+  const cur = ui.manual[key];
+  let out = `<div class="dicepick"><span class="lbl">${esc(label)}</span><div class="dicerow n${max}">`;
+  for (let v = 1; v <= max; v++) out += `<button class="die ${cur === v ? 'on' : ''}" data-act="pickDie" data-k="${key}" data-v="${v}" aria-label="${esc(label)} ${v}">${v}</button>`;
+  return out + '</div></div>';
+}
+function takeD100() {
+  const v = parseInt(ui.d100, 10);
+  ui.d100 = '';
+  for (const el of document.querySelectorAll('[data-d100]')) el.value = '';
+  return physical() && v >= 1 && v <= 100 ? v : undefined;
+}
+const d100Field = () => (physical() ? `<label class="field d100">Your d100 roll (used by the next table or oracle you tap) <input type="number" inputmode="numeric" min="1" max="100" data-d100="1" value="${esc(ui.d100)}" placeholder="1 to 100"></label>` : '');
 try { Object.assign(ui, JSON.parse(localStorage.getItem('ss.ui') || '{}'), { modal: null, lastRoll: null, pendingRender: false, drafts: {} }); } catch { /* ignore */ }
 function saveUi() {
   try { localStorage.setItem('ss.ui', JSON.stringify({ tab: ui.tab, heroId: ui.heroId, rollStat: ui.rollStat, rollHero: ui.rollHero })); } catch { /* ignore */ }
@@ -318,26 +333,35 @@ function viewRoll() {
     (groups[g] = groups[g] || []).push(m);
   }
   const progTracks = sorted(S().tracks).filter(t => !t.done);
+  const phys = physical();
+  const haveAction = ui.manual.a && ui.manual.c1 && ui.manual.c2;
+  const haveProg = ui.manual.p1 && ui.manual.p2;
   return `<section class="card">
-    <h3>Action roll</h3>
+    <div class="row between"><h3>Action roll</h3>
+      <div class="seg" role="group" aria-label="Who rolls the dice">
+        <button class="${phys ? '' : 'on'}" data-act="diceMode" data-v="0">App rolls</button><button class="${phys ? 'on' : ''}" data-act="diceMode" data-v="1">My dice</button></div></div>
     <div class="form">
       <label>Hero <select data-ui="rollHero">${hs.map(x => `<option value="${x.id}" ${h && x.id === h.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></label>
       <label>Move <select data-ui="moveId"><option value="">(none)</option>${D.moves.filter(m => m.roll === 'action_roll').map(m => `<option value="${m.id}" ${m.id === ui.moveId ? 'selected' : ''}>${esc(m.name)}</option>`).join('')}</select></label>
       <label>Roll + <select data-ui="rollStat">${opts.map(([k, l, v]) => `<option value="${k}" ${k === ui.rollStat ? 'selected' : ''}>${esc(l)} (${v})</option>`).join('')}</select></label>
       <div class="row between"><span>Adds</span>${stepper(['__ui', 'rollAdds'], ui.rollAdds, { min: -3, max: 5 })}</div>
     </div>
-    <button class="btn big accent" data-act="actionRoll" ${h ? '' : 'disabled'}>Roll</button>
+    ${phys ? `${dicePicker('Action die (d6)', 'a', 6)}${dicePicker('Challenge die 1 (d10)', 'c1', 10)}${dicePicker('Challenge die 2 (d10)', 'c2', 10)}` : ''}
+    <button class="btn big accent" data-act="actionRoll" ${h && (!phys || haveAction) ? '' : 'disabled'}>${phys ? 'Resolve' : 'Roll'}</button>
+    ${phys && !haveAction ? '<p class="hint">Roll your dice, then tap what you got.</p>' : ''}
     ${h ? '' : '<p class="empty">Add a hero first.</p>'}
     ${ui.lastRoll && ui.lastRoll.kind === 'action' ? rollCard(ui.lastRoll) : ''}
     ${move ? `<details class="movetext" data-key="cur-move" open><summary>${esc(move.name)}</summary>${md(move.text)}${(move.oracles || []).map(o => `<button class="btn sm" data-act="rollOracle" data-id="${o}">Roll ${esc(D.oracleById[o].name)}</button>`).join(' ')}</details>` : ''}
   </section>
   <section class="card">
     <h3>Progress roll</h3>
-    ${progTracks.length ? `<div class="chips">${progTracks.map(t => `<button class="chip" data-act="progressRoll" data-id="${t.id}">${esc(t.name || t.type)} (${boxes(t.ticks)})</button>`).join('')}</div>` : '<p class="empty">No open tracks.</p>'}
+    ${phys ? `${dicePicker('Challenge die 1 (d10)', 'p1', 10)}${dicePicker('Challenge die 2 (d10)', 'p2', 10)}<p class="hint">${haveProg ? 'Now tap the track you are rolling for.' : 'Roll two d10, tap what you got, then tap the track.'}</p>` : ''}
+    ${progTracks.length ? `<div class="chips">${progTracks.map(t => `<button class="chip ${ui.progPick === t.id ? 'on' : ''}" data-act="progressRoll" data-id="${t.id}" ${phys && !haveProg ? 'disabled' : ''}>${esc(t.name || t.type)} (${boxes(t.ticks)})</button>`).join('')}</div>` : '<p class="empty">No open tracks.</p>'}
     ${ui.lastRoll && ui.lastRoll.kind === 'progress' ? rollCard(ui.lastRoll) : ''}
   </section>
   <section class="card">
     <h3>Ask the Oracle</h3>
+    ${d100Field()}
     <div class="chips">${ODDS.map(([l, c]) => `<button class="chip" data-act="yesno" data-c="${c}">${l}</button>`).join('')}</div>
     <div class="chips">${[6, 10, 100].map(n => `<button class="chip" data-act="die" data-n="${n}">d${n}</button>`).join('')}</div>
     ${ui.lastYesNo ? `<p class="yesno ${ui.lastYesNo.yes ? 'yes' : 'no'}">${esc(ui.lastYesNo.text)}</p>` : ''}
@@ -367,6 +391,7 @@ function viewOracles() {
     </div>
     ${ui.oracleResults.length ? `<ol class="results">${ui.oracleResults.map(r => `<li><b>${esc(r.text)}</b> <small>${esc(r.label)}</small></li>`).join('')}</ol>` : '<p class="empty">Tap a table to roll. Results also go to the journal.</p>'}
   </section>
+  ${physical() ? `<section class="card">${d100Field()}</section>` : ''}
   <input class="search" data-ui="oracleQuery" value="${esc(ui.oracleQuery)}" placeholder="Search oracles">
   ${Object.entries(groups).map(([g, os]) => `<section class="card"><h4>${esc(g)}</h4><div class="chips">${os.map(o => `<button class="chip" data-act="rollOracle" data-id="${o.id}">${esc(o.name)}</button>`).join('')}</div></section>`).join('')}`;
 }
@@ -524,20 +549,30 @@ function doActionRoll() {
   if (!h) return;
   const opts = rollStatOptions(h);
   const opt = opts.find(o => o[0] === ui.rollStat) || opts[0];
-  const r = actionRoll({ stat: opt[2], adds: ui.rollAdds, momentum: h.momentum });
+  const m = ui.manual;
+  const dice = physical() ? (m.a && m.c1 && m.c2 ? { a: m.a, c1: m.c1, c2: m.c2 } : null) : undefined;
+  if (dice === null) return;
+  const r = actionRoll({ stat: opt[2], adds: ui.rollAdds, momentum: h.momentum, dice });
+  r.physical = !!dice;
+  ui.manual = { ...ui.manual, a: null, c1: null, c2: null };
   const move = D.moveById[ui.moveId];
   r.heroId = h.id;
   r.moveId = ui.moveId;
   r.applied = {};
   r.label = `${h.name}: ${move ? move.name + ', ' : ''}+${opt[1]}`;
   ui.lastRoll = r;
-  log(`**${RESULT_LABEL[r.result]}${r.match ? ' (match)' : ''}** ${r.label}\nAction ${r.cancelled ? '0 (cancelled)' : r.a} + ${r.stat}${r.adds ? ' + ' + r.adds : ''} = ${r.score} vs ${r.c1}, ${r.c2}`, 'roll');
+  log(`**${RESULT_LABEL[r.result]}${r.match ? ' (match)' : ''}** ${r.label}${r.physical ? ' (own dice)' : ''}\nAction ${r.cancelled ? '0 (cancelled)' : r.a} + ${r.stat}${r.adds ? ' + ' + r.adds : ''} = ${r.score} vs ${r.c1}, ${r.c2}`, 'roll');
 }
 
 function doProgressRoll(id) {
   const t = S().tracks[id];
   if (!t) return;
-  const r = progressRoll({ ticks: t.ticks });
+  const m = ui.manual;
+  const dice = physical() ? (m.p1 && m.p2 ? { c1: m.p1, c2: m.p2 } : null) : undefined;
+  if (dice === null) { ui.tab = 'roll'; ui.progPick = id; saveUi(); return; }
+  const r = progressRoll({ ticks: t.ticks, dice });
+  ui.manual = { ...ui.manual, p1: null, p2: null };
+  ui.progPick = null;
   r.trackId = id;
   r.applied = {};
   const hh = S().heroes[ui.rollHero] || currentHero();
@@ -556,7 +591,7 @@ function doProgressRoll(id) {
 function doOracle(id, quiet = false) {
   const o = D.oracleById[id];
   if (!o) return null;
-  const r = rollOracle(o, D.oracleById);
+  const r = rollOracle(o, D.oracleById, 0, takeD100());
   const label = r.chain.map(c => `${c.table} ${c.roll}`).join(' → ');
   if (!quiet) {
     ui.oracleResults.unshift({ text: r.text, label });
@@ -700,7 +735,7 @@ const actions = {
     render(); $view().scrollTop = 0;
   },
   yesno(el) {
-    const r = askOracle(+el.dataset.c);
+    const r = askOracle(+el.dataset.c, takeD100());
     const label = ODDS.find(o => o[1] === r.chance)[0];
     ui.lastYesNo = { yes: r.yes, text: `${label}: ${r.yes ? 'Yes' : 'No'} (${r.roll})${r.match ? ', with a twist!' : ''}` };
     log(`**Ask the Oracle** (${label}): ${r.yes ? 'Yes' : 'No'}, rolled ${r.roll}${r.match ? '. Match: extreme result or twist.' : ''}`, 'oracle');
@@ -785,6 +820,8 @@ const actions = {
     ui.recapDraft = ''; ui.endDone.recap = true; render();
   },
   fx(el) { applyFx(el); },
+  diceMode(el) { store.setPref('physical', el.dataset.v); ui.manual = {}; render(); },
+  pickDie(el) { const k = el.dataset.k, v = +el.dataset.v; ui.manual[k] = ui.manual[k] === v ? null : v; render(); },
   export() {
     const blob = new Blob([JSON.stringify(S(), null, 1)], { type: 'application/json' });
     const a = document.createElement('a');
@@ -1283,6 +1320,7 @@ function wire() {
     if (t.dataset.draft) ui.drafts[t.id] = t.value;
     if (t.dataset.cw && t.tagName === 'INPUT' && ui.cw) { ui.cw[t.dataset.cw] = t.value; cwRefresh(); }
     if (t.id === 'recaptext') ui.recapDraft = t.value;
+    if (t.dataset.d100) ui.d100 = t.value;
   });
   document.addEventListener('focusout', () => setTimeout(() => { if (ui.pendingRender) requestRender(); }, 0));
   // Hold re-renders while a finger is down so the button being tapped still exists when its click fires.
