@@ -540,7 +540,36 @@ function viewSettings() {
 const VIEWS = { heroes: viewHeroes, tracks: viewTracks, roll: viewRoll, oracles: viewOracles, journal: viewJournal, ask: viewAsk };
 const viewPic = () => `<div class="modal-head"><h3>Picture</h3><button class="btn sm" data-act="closePic">Close</button></div>
   ${ui.pic ? `<img class="bigpic" src="${esc(ui.pic)}" alt="">` : ''}`;
-const MODALS = { pic: viewPic, assets: viewAssetPicker, settings: viewSettings, villain: viewVillain, create: viewCreate, campaigns: viewCampaigns, begin: viewBegin, end: viewEnd };
+const REPO = 'stephensmith76/supersworn';
+const FB_KINDS = { bug: 'Issue', wish: 'Wish', rule: 'Rule' };
+function issueUrl(f) {
+  const title = `[${FB_KINDS[f.kind]}] ${f.text.split('\n')[0].slice(0, 70)}`;
+  const body = `${f.text}\n\n---\nLogged by ${f.author || 'a player'} on ${new Date(f.created).toLocaleString()} from the ${f.where || 'app'} screen (${S().meta.name}).`;
+  const labels = f.kind === 'bug' ? 'bug' : f.kind === 'wish' ? 'enhancement' : 'question';
+  return `https://github.com/${REPO}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}&labels=${labels}`;
+}
+function viewFeedback() {
+  const items = sorted(S().feedback).reverse();
+  const open = items.filter(f => !f.done), closed = items.filter(f => f.done);
+  const kind = ui.fbKind || 'bug';
+  const row = f => `<article class="fb ${f.done ? 'done' : ''}"><header><span class="tag">${FB_KINDS[f.kind]}</span> <small>${esc(f.author)} · ${esc(f.where)} · ${new Date(f.created).toLocaleDateString([], { month: 'short', day: 'numeric' })}</small></header>
+    <p>${esc(f.text)}</p>
+    <div class="row wrap">
+      <a class="btn sm ${f.sent ? '' : 'accent'}" href="${esc(issueUrl(f))}" target="_blank" rel="noopener" data-fbsent="${esc(f.id)}">${f.sent ? 'Sent to GitHub' : 'Send to GitHub'}</a>
+      <button class="btn sm" data-act="fbDone" data-id="${esc(f.id)}">${f.done ? 'Reopen' : 'Done'}</button>
+      <button class="btn sm danger" data-act="del" data-path='${esc(JSON.stringify(['feedback', f.id]))}'>Delete</button>
+    </div></article>`;
+  return `<div class="modal-head"><h3>Issues and wishes</h3><button class="btn sm" data-act="closeModal">Close</button></div>
+  <section class="card">
+    <div class="seg" role="group" aria-label="Type">${Object.entries(FB_KINDS).map(([k, l]) => `<button class="${k === kind ? 'on' : ''}" data-act="fbKind" data-v="${k}">${l}</button>`).join('')}</div>
+    <textarea id="fbtext" data-draft="1" rows="3" placeholder="${kind === 'bug' ? 'What went wrong? e.g. Burn button vanished after I changed heroes' : kind === 'wish' ? 'What would make play easier? e.g. a list of our contacts' : 'A rule that felt off, e.g. Heat climbs too fast'}">${esc(ui.drafts.fbtext || '')}</textarea>
+    <button class="btn accent" data-act="fbSave">Save</button>
+    <p class="hint">Saved here and synced to your partner. Send to GitHub after the session, or copy the list to paste to Claude.</p>
+  </section>
+  ${open.length ? `<div class="row between"><h4>Open (${open.length})</h4><button class="btn sm" data-act="fbCopy">Copy list</button></div>${open.map(row).join('')}` : '<p class="empty">Nothing logged yet.</p>'}
+  ${closed.length ? `<details data-key="fb-closed"><summary>Done (${closed.length})</summary>${closed.map(row).join('')}</details>` : ''}`;
+}
+const MODALS = { feedback: viewFeedback, pic: viewPic, assets: viewAssetPicker, settings: viewSettings, villain: viewVillain, create: viewCreate, campaigns: viewCampaigns, begin: viewBegin, end: viewEnd };
 const $view = () => document.getElementById('view');
 
 function render() {
@@ -860,6 +889,23 @@ const actions = {
     ui.recapDraft = ''; ui.endDone.recap = true; render();
   },
   fx(el) { applyFx(el); },
+  fbKind(el) { ui.fbKind = el.dataset.v; render(); },
+  fbSave() {
+    const t = document.getElementById('fbtext');
+    const text = (t ? t.value : '').trim();
+    if (!text) return;
+    const f = { id: uid(), created: Date.now(), author: me(), kind: ui.fbKind || 'bug', text, where: ui.fbWhere || ui.tab, done: false, sent: false };
+    store.set(['feedback', f.id], f);
+    delete ui.drafts.fbtext;
+    toast('Saved. Back to the game.');
+    ui.modal = ui.fbBefore || null; render();
+  },
+  fbDone(el) { const f = S().feedback[el.dataset.id]; if (f) store.set(['feedback', f.id, 'done'], !f.done); },
+  fbCopy() {
+    const open = sorted(S().feedback).filter(f => !f.done);
+    const text = 'Supersworn app notes from play:\n' + open.map(f => `- [${FB_KINDS[f.kind]}] ${f.text.replace(/\n/g, ' ')} (${f.author}, ${f.where})`).join('\n');
+    (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(() => toast('Copied. Paste it to Claude.'), () => toast('Could not copy. Long-press the notes to select them instead.'));
+  },
   viewPic(el) { ui.pic = store.get(JSON.parse(el.dataset.path)); ui.modalBefore = ui.modal; ui.modal = 'pic'; render(); },
   closePic() { ui.modal = ui.modalBefore || null; ui.pic = null; render(); },
   diceMode(el) { store.setPref('physical', el.dataset.v); ui.manual = {}; render(); },
@@ -1294,6 +1340,12 @@ function wire() {
   document.addEventListener('click', e => {
     const tab = e.target.closest('nav button[data-tab]');
     if (tab) { ui.tab = tab.dataset.tab; ui.modal = null; saveUi(); render(); $view().scrollTop = 0; return; }
+    if (e.target.closest('#fbbtn')) {
+      if (ui.modal === 'feedback') { ui.modal = ui.fbBefore || null; } else { ui.fbWhere = ui.modal || ui.tab; ui.fbBefore = ui.modal; ui.modal = 'feedback'; }
+      render(); $view().scrollTop = 0; return;
+    }
+    const sent = e.target.closest('[data-fbsent]');
+    if (sent) { store.set(['feedback', sent.dataset.fbsent, 'sent'], true); return; }
     if (e.target.closest('#campname')) { ui.modal = ui.modal === 'campaigns' ? null : 'campaigns'; render(); $view().scrollTop = 0; return; }
     if (e.target.closest('#settingsbtn')) { ui.modal = ui.modal === 'settings' ? null : 'settings'; render(); $view().scrollTop = 0; return; }
     const el = e.target.closest('[data-act]');

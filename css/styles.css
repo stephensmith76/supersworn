@@ -263,3 +263,11 @@ input, select, textarea, .field input, .form select { font-size: 16px; }
 .face { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; vertical-align: middle; margin: -4px 6px -4px -6px; }
 .bigpic { width: 100%; border-radius: var(--radius); border: 1px solid var(--line); }
 .toast { position: fixed; left: 16px; right: 16px; bottom: calc(70px + env(safe-area-inset-bottom)); background: var(--surface2); border: 1px solid var(--miss); color: var(--text); padding: 12px; border-radius: 10px; z-index: 10; }
+/* issues and wishes */
+.fb { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px; margin: 8px 0; }
+.fb.done { opacity: .55; }
+.fb header small { color: var(--muted); }
+.fb p { margin: 6px 0; white-space: pre-wrap; }
+a.btn { text-decoration: none; color: inherit; }
+a.btn.accent { color: var(--accent-ink); }
+#fbtext { margin: 10px 0 8px; }

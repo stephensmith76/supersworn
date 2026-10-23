@@ -87,6 +87,11 @@ const cleanNemesis = entity((n, k) => ({
   segments: oneOf(Number(n.segments), [4, 6, 8, 10], 8), filled: num(n.filled, 0, 0, 10),
 }));
 
+const cleanFeedback = entity((f, k) => ({
+  id: k, created: created(f), author: str(f.author, 60), kind: oneOf(f.kind, ['bug', 'wish', 'rule'], 'bug'),
+  text: str(f.text, 2000), where: str(f.where, 40), done: !!f.done, sent: !!f.sent,
+}));
+
 const cleanEntry = entity((e, k) => ({
   id: k, created: created(e), author: str(e.author, 60), kind: oneOf(e.kind, ['note', 'roll', 'oracle', 'session', 'recap'], 'note'), text: str(e.text, 8000),
 }));
@@ -109,6 +114,7 @@ export function sanitize(s) {
     clocks: map(src.clocks, cleanClock),
     nemeses: map(src.nemeses, cleanNemesis),
     journal: map(src.journal, cleanEntry),
+    feedback: map(src.feedback, cleanFeedback),
   };
 }
 
@@ -118,7 +124,7 @@ export function blankCampaign(name = 'New campaign', game = 'supersworn') {
   return {
     meta: { id: uid(), name, created: Date.now(), city: '', game },
     shared: { resources: 5, session: 0, sessionStart: 0 },
-    heroes: {}, tracks: {}, clocks: {}, nemeses: {}, journal: {},
+    heroes: {}, tracks: {}, clocks: {}, nemeses: {}, journal: {}, feedback: {},
   };
 }
 

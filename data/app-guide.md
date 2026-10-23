@@ -44,6 +44,10 @@ The app has six tabs along the bottom (Heroes, Tracks, Roll, Oracles, Journal, H
 - Guides: step-by-step examples for breaking into a building, a fight, a night on patrol, working a case, a rescue, interrogating a thug, downtime, playing with two heroes, and Nemesis moves. Move buttons open that move on the Roll tab.
 - Rules questions: the chat (this). "Ask" for a question, "Walk me through it" for a step-by-step plan for a situation. "Save to journal" keeps an answer. "Clear chat" starts over.
 
+## Issues and wishes (speech-bubble icon, top right)
+- Tap it from any screen to log something about the app or the rules during play. Pick Issue (something broke), Wish (a feature you want) or Rule (a rule that felt off), type a line and tap Save. It remembers which screen you were on and syncs to your partner.
+- The list shows open notes with "Send to GitHub" (opens a ready-made issue on the app's GitHub page, labeled bug, enhancement or question), "Done" and "Delete". "Copy list" copies all open notes so you can paste them to Claude.
+
 ## Settings (gear icon)
 - Your name: shown on journal entries.
 - Campaign name and City name.
