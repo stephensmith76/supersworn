@@ -196,3 +196,10 @@ nav button { font-size: 16px; letter-spacing: .03em; }
 .msg.assistant .btn { margin-top: 6px; }
 .msg.thinking { color: var(--muted); font-style: italic; }
 .ask { position: sticky; bottom: 0; }
+.guide .steps { padding-left: 22px; margin: 6px 0; }
+.guide .steps li { margin: 10px 0; }
+.guide .steps li > b { display: block; color: var(--accent); }
+.guide .steps p { margin: 4px 0; font-size: 14px; }
+.tipline { font-size: 13px; border-left: 3px solid var(--accent); padding-left: 8px; color: var(--muted); }
+select.pos.bad { border-color: var(--miss); color: var(--miss); }
+select.pos.ok { border-color: var(--strong); color: var(--strong); }

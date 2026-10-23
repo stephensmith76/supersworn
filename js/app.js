@@ -16,6 +16,7 @@ async function loadData() {
     fetch('data/villains.json').then(r => r.json()),
     fetch('data/rules-notes.md').then(r => r.text()),
   ]);
+  D.guides = (await fetch('data/guides.json').then(r => r.json())).guides;
   D.villain = vil;
   D.notes = notes;
   ss.oracles = ss.oracles.concat(vil.oracles);
@@ -198,6 +199,7 @@ function viewTracks() {
         <div class="row wrap">
           <select data-bind='${esc(JSON.stringify(p.concat('type')))}'>${D.rules.trackTypes.map(x => `<option ${x === t.type ? 'selected' : ''}>${x}</option>`).join('')}</select>
           <select data-bind='${esc(JSON.stringify(p.concat('rank')))}'>${RANKS.map(x => `<option ${x === t.rank ? 'selected' : ''}>${x}</option>`).join('')}</select>
+          ${t.type === 'combat' ? `<select class="pos ${t.position === 'bad' ? 'bad' : 'ok'}" data-bind='${esc(JSON.stringify(p.concat('position')))}'><option value="control" ${t.position !== 'bad' ? 'selected' : ''}>In control</option><option value="bad" ${t.position === 'bad' ? 'selected' : ''}>Bad spot</option></select>` : ''}
           <span class="muted">${boxes(t.ticks)}/10</span>
         </div>
         ${trackBoxes(t.ticks)}
@@ -375,17 +377,25 @@ function viewVillain() {
 function viewAsk() {
   const ai = aiReady();
   const msgs = ui.chat || [];
-  return `<section class="card">
+  const guides = `<section class="card">
+    <h3>Guides</h3>
+    <p class="hint">Example sequences of moves for common situations. Tap a move to open it on the Roll tab.</p>
+    ${D.guides.map(g => `<details class="guide"><summary>${esc(g.title)}</summary><p class="muted">${esc(g.summary)}</p>
+      <ol class="steps">${g.steps.map(s => `<li><b>${esc(s.t)}</b>${md(s.x)}${s.m && D.moveById[s.m] ? `<button class="btn sm" data-act="guideMove" data-id="${s.m}">${esc(D.moveById[s.m].name)}</button>` : ''}</li>`).join('')}</ol>
+      ${g.tip ? `<p class="tipline">${esc(g.tip)}</p>` : ''}</details>`).join('')}
+  </section>`;
+  return guides + `<section class="card">
     <h3>Rules questions</h3>
     <p class="hint">Answers use the Supersworn and Starforged rules plus your current heroes, tracks and Nemeses. ${ai ? `Using ${esc(ai.label)}.` : ''}</p>
     ${ai ? '' : `<p class="alert">Add an API key in settings (gear icon) to turn this on.</p>`}
   </section>
-  <div class="chat">${msgs.map((m, i) => `<div class="msg ${m.role}">${m.role === 'user' ? esc(m.text) : md(m.text)}
+  <div class="chat">${msgs.map((m, i) => `<div class="msg ${m.role}">${m.role === 'user' ? esc(m.show || m.text) : md(m.text)}
     ${m.role === 'assistant' && !m.error ? `<button class="btn sm" data-act="saveAnswer" data-i="${i}">Save to journal</button>` : ''}</div>`).join('')}
     ${ui.asking ? '<div class="msg assistant thinking">Checking the rules…</div>' : ''}</div>
   <section class="card ask">
     <textarea id="askq" rows="2" placeholder="Can I burn momentum on a progress roll?" ${ai ? '' : 'disabled'}></textarea>
     <div class="row wrap"><button class="btn accent" data-act="askSend" ${ai && !ui.asking ? '' : 'disabled'}>Ask</button>
+    <button class="btn" data-act="askSend" data-walk="1" ${ai && !ui.asking ? '' : 'disabled'}>Walk me through it</button>
     ${msgs.length ? '<button class="btn sm" data-act="askClear">Clear chat</button>' : ''}</div>
   </section>`;
 }
@@ -544,11 +554,27 @@ const actions = {
     log(`**A new villain emerges.** ${n.gimmick} Scheme: ${n.scheme}.`, 'oracle');
     ui.modal = null; ui.tab = 'tracks'; saveUi(); render();
   },
-  async askSend() {
+  guideMove(el) {
+    const m = D.moveById[el.dataset.id];
+    ui.moveId = m.id;
+    if (m.stats.length) ui.rollStat = m.stats[0];
+    ui.lastRoll = null; ui.tab = 'roll'; saveUi(); render();
+    const mt = $view().querySelector('.movetext[open]');
+    $view().scrollTop = 0;
+    if (m.roll !== 'action_roll') {
+      // Not rollable from the action roller: open it in the moves list instead.
+      ui.moveId = ''; ui.moveQuery = m.name; render();
+      const d = $view().querySelector('.movetext:not([open])');
+      if (d) { d.open = true; d.scrollIntoView(); }
+    } else if (mt) mt.scrollIntoView({ block: 'nearest' });
+  },
+  async askSend(el) {
     const q = document.getElementById('askq');
-    const text = q.value.trim();
+    let text = q.value.trim();
+    const show = (el && el.dataset.walk ? 'Walk me through it: ' : '') + text;
     if (!text || ui.asking) return;
-    ui.chat = (ui.chat || []).concat({ role: 'user', text });
+    if (el && el.dataset.walk) text = `Walk us through this situation step by step as a sequence of moves, using our current heroes and their assets. For each step give the move, the stat to roll, and what each result would mean. Situation: ${text}`;
+    ui.chat = (ui.chat || []).concat({ role: 'user', text, show });
     ui.asking = true; render();
     try {
       const answer = await askRules(ui.chat.filter(m => !m.error), buildContext());
@@ -562,7 +588,7 @@ const actions = {
   askClear() { ui.chat = []; saveChat(); render(); },
   saveAnswer(el) {
     const a = ui.chat[+el.dataset.i], qn = ui.chat[+el.dataset.i - 1];
-    log(`**Rules: ${qn ? qn.text : ''}**\n\n${a.text}`, 'oracle');
+    log(`**Rules: ${qn ? (qn.show || qn.text) : ''}**\n\n${a.text}`, 'oracle');
     el.textContent = 'Saved';
   },
   inc(el) { const s = el.closest('.stepper'); const p = JSON.parse(s.dataset.path); const cur = p[0] === '__ui' ? ui[p[1]] : store.get(p) || 0; clampSet(p, cur + 1, +s.dataset.min, +s.dataset.max); },

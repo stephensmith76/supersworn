@@ -1,0 +1,296 @@
+{
+ "guides": [
+  {
+   "id": "break_in",
+   "title": "Break into a building",
+   "summary": "Scout it, get inside, find what you came for, and get out before anyone notices.",
+   "tip": "Not every step needs a roll. If nothing is at stake (an empty building, no clock running), just say what happens and move on.",
+   "steps": [
+    {
+     "t": "Decide why you are going in",
+     "m": null,
+     "x": "Tie it to a vow or a case. Example: Night Owl is working the case \"Who runs the Eastside docks?\" and wants the shipping office's ledger. If the break-in is a big deal, give it its own small track (Troublesome or Dangerous). If it's one obstacle, a single roll or two is enough."
+    },
+    {
+     "t": "Case the place",
+     "m": "sf/secure_an_advantage",
+     "x": "Watch from a rooftop across the street, roll +wits (observing) or +shadow (staying unseen). On a hit, take +2 momentum or +1 on your next move. Roll the Trouble Building oracle or City Location if you need to know what the building is. On a miss, your assumptions betray you: maybe there's a guard you didn't see. Pay the Price."
+    },
+    {
+     "t": "Get inside",
+     "m": "sf/face_danger",
+     "x": "This is the risky part. Picking a lock quietly is +shadow. Climbing to a third-floor window is +edge. Prying a door is +iron. Kit helps: name the item you pull out (\"lockpicks\") and spend 1 Kit for +1, or +2 if the item is the whole answer. Strong hit: you're in clean, take +1 momentum. Weak hit: you're in, but make a suffer move (-1), like losing 1 momentum to a close call. Miss: Pay the Price. An alarm, a dog, or a camera that saw you (+1 Heat)."
+    },
+    {
+     "t": "Search for what you came for",
+     "m": "ss/work_the_case",
+     "x": "If this is for a case, use Work the Case +wits (examining records). Strong hit: mark progress on the case and roll a Clue. Weak hit: same, but take +1 Heat, a suffer move, or advance a Nemesis scheme. Not on a case? Use Gather Information instead."
+    },
+    {
+     "t": "Something goes wrong (it usually does)",
+     "m": "sf/face_danger",
+     "x": "A guard's flashlight, footsteps on the stairs. Hide with Face Danger +shadow. If it turns into a fight, use Enter the Fray +shadow (you're acting against an unaware foe) and see the fight guide."
+    },
+    {
+     "t": "Get out and update the app",
+     "m": null,
+     "x": "Mark progress on the case or vow if you earned it (Reach a Milestone on a vow when you overcome a critical obstacle or gain meaningful insight). Add Heat if anyone saw you or you broke into a public building. Write one line in the journal about what you found."
+    }
+   ]
+  },
+  {
+   "id": "fight",
+   "title": "A fight, step by step",
+   "summary": "Set an objective, track whether you are in control or in a bad spot, build progress, then finish it.",
+   "tip": "Two players: one of you can Aid Your Ally by Securing an Advantage or Gaining Ground for the other. For a fight that doesn't deserve the full treatment, use Battle: one roll and it's done.",
+   "steps": [
+    {
+     "t": "Set the objective and rank",
+     "m": "sf/enter_the_fray",
+     "x": "Decide what winning means: \"take down the three dock thugs\" or \"grab the ledger and get out.\" Give it a rank (three armed thugs: Dangerous). On the Tracks tab, add a track of type combat with that rank."
+    },
+    {
+     "t": "Roll to start",
+     "m": "sf/enter_the_fray",
+     "x": "Enter the Fray. Pick the stat by how the fight starts: on the move +edge, facing off +heart, close quarters +iron, ambushing an unaware foe +shadow, caught in a trap or sizing it up +wits. Strong hit: take +2 momentum and you are in control. Weak hit: choose one. Miss: you start in a bad spot."
+    },
+    {
+     "t": "In control? Press the attack",
+     "m": "sf/strike",
+     "x": "When you're in control, Strike (+iron close, +edge at range). Strong hit: mark progress twice and stay in control. Weak hit: mark progress twice, but now you're in a bad spot. Or Gain Ground to set something up (a better position, cornering them): on a hit you stay in control and pick from mark progress, +2 momentum, or +1 on your next move."
+    },
+    {
+     "t": "In a bad spot? Fight back or get out of the way",
+     "m": "sf/clash",
+     "x": "When you're in a bad spot, Clash to trade blows: strong hit marks progress twice and puts you in control; weak hit marks progress once, but you stay in a bad spot and Pay the Price. Or React Under Fire to dodge, take cover or block: strong hit puts you back in control."
+    },
+    {
+     "t": "Take the hits",
+     "m": "sf/endure_harm",
+     "x": "When Pay the Price means you get hurt, Endure Harm: -1 for a punch, -2 for a knife or a bad fall, -3 for a gunshot. Roll +health or +iron if your health hits 0 or you want to resist. Street versions of Toughness and Healing Factor help here."
+    },
+    {
+     "t": "Finish it",
+     "m": "sf/take_decisive_action",
+     "x": "When you have enough progress (four or five boxes is a fair shot), Take Decisive Action. This is a progress roll, but if you're in a bad spot, a strong hit counts as a weak hit and a weak hit counts as a miss. So get yourself in control first. Strong hit: you win. Weak hit: you win, at a cost. Miss: they win or the objective is lost."
+    },
+    {
+     "t": "After the fight",
+     "m": null,
+     "x": "Delete or close the combat track. If you beat a named foe, Reach a Milestone on any vow it serves. If a Boss or Villain escaped, or you won on a weak hit, add them as a Nemesis. Using lethal force? +1 Heat, and Code of Honor may have something to say about it."
+    }
+   ]
+  },
+  {
+   "id": "patrol",
+   "title": "A night on patrol",
+   "summary": "Pick an area, find trouble, deal with it, and see how the neighborhood remembers you.",
+   "tip": "Rolling Trouble then City Location then Descriptor gives you a full scene in three taps.",
+   "steps": [
+    {
+     "t": "Pick the area and rank",
+     "m": "ss/go_on_patrol",
+     "x": "\"Eastside docks, all night\" in a rough area is Dangerous. Add a track of type patrol with that rank."
+    },
+    {
+     "t": "Go On Patrol",
+     "m": "ss/go_on_patrol",
+     "x": "Pick your approach: rooftops +edge, staying hidden +shadow, talking to locals +heart, walking a visible beat +iron, police scanner +wits. Strong hit: mark progress and roll Trouble; you're there before it starts. Weak hit: mark progress and roll Trouble, but it's already happening and you choose a cost. Miss: no progress, Pay the Price. Any match: check scheme clocks, and if a Nemesis is locked up, run the escape check on the Tracks tab."
+    },
+    {
+     "t": "Handle the Trouble",
+     "m": null,
+     "x": "Play it out with normal moves. A mugging might be one Face Danger. A hostage situation might be a fight or a scene challenge. Kindness results are often just Compel or Aid moves, and they make good Heroics moments."
+    },
+    {
+     "t": "Maybe a plot",
+     "m": "ss/uncover_a_plot",
+     "x": "Strong hit with a match on Go On Patrol means Uncover a Plot: roll the Plot oracle, mark two ticks on Heroics, and decide whether to Open a Case."
+    },
+    {
+     "t": "Repeat, then Finish Patrol",
+     "m": "ss/finish_patrol",
+     "x": "Patrol two to four times in a night, then roll Finish Patrol on the track. Strong hit: Heroics reward by rank and lose 1 Heat. Weak hit: one rank lower. Miss: abandon it (Pay the Price, +1 Heat) or go back and fix it."
+    }
+   ]
+  },
+  {
+   "id": "case",
+   "title": "Work a case from start to finish",
+   "summary": "Open it, follow leads, put the pieces together, then confront the culprit.",
+   "tip": "",
+   "steps": [
+    {
+     "t": "Open the case",
+     "m": "ss/open_a_case",
+     "x": "Name it (\"Who's poisoning the projects' water?\") and rank it, usually Dangerous or Formidable. Tie it to a vow; if there isn't one, Swear an Iron Vow too. Add a track of type case. Roll one Clue to start."
+    },
+    {
+     "t": "Follow a lead",
+     "m": "ss/work_the_case",
+     "x": "Each Work the Case is one lead: a crime scene (+wits), a witness (+heart), shaking down a fence (+iron), tailing a suspect (+shadow), racing to a scene (+edge). Strong hit: mark progress and roll a Clue. Weak hit: same, plus a cost. Miss: the lead goes cold; on a match it was a false lead planted on purpose."
+    },
+    {
+     "t": "Let the clues shape the next lead",
+     "m": null,
+     "x": "Every clue points somewhere. \"A matchbook from a specific place\" means the next lead is that bar. Investigator and Journalist assets add bonuses here, and Enhanced Senses helps too."
+    },
+    {
+     "t": "Solve the Case",
+     "m": "ss/solve_the_case",
+     "x": "With five or six boxes filled, roll Solve the Case. Strong hit: you know who, how and where; Reach a Milestone on the vow, take +2 momentum, and the confrontation drops a rank. Weak hit: you know who, but they know you're coming. Miss: accuse the wrong person (+2 Heat) or keep digging."
+    },
+    {
+     "t": "Confront them",
+     "m": "sf/enter_the_fray",
+     "x": "Now it's a fight, a chase, or a Compel. If they're a Boss or Villain who gets away, they become a Nemesis."
+    }
+   ]
+  },
+  {
+   "id": "rescue",
+   "title": "Rescue from a burning building",
+   "summary": "Use a scene challenge: a progress track against a ticking tension clock.",
+   "tip": "The same setup works for a runaway train, a bomb, a collapsing parking garage, or a hostage standoff where the clock is the gunman's patience.",
+   "steps": [
+    {
+     "t": "Begin the Scene",
+     "m": "sf/scene_challenge/begin_the_scene",
+     "x": "Name the objective (\"get the family out of the fourth floor\"). Rank it: Troublesome if you have a clear advantage, Dangerous if you're ready, Formidable if you're outmatched. Add a track (type scene challenge) and a 4-segment clock named \"Fire spreads.\""
+    },
+    {
+     "t": "Act inside the scene",
+     "m": "sf/scene_challenge/face_danger",
+     "x": "Use the scene-challenge versions of Face Danger and Secure an Advantage. Kicking through a door +iron, finding the stairwell through smoke +wits, keeping a panicked kid calm +heart. Strong hit: mark progress (twice on a match). Weak hit: mark progress, but fill a clock segment. Miss: fill a segment (two on a match) and Pay the Price."
+    },
+    {
+     "t": "Take some heat",
+     "m": "sf/endure_harm",
+     "x": "Smoke and fire mean Endure Harm. Someone you can't reach in time might mean Endure Stress."
+    },
+    {
+     "t": "Finish the Scene",
+     "m": "sf/scene_challenge/finish_the_scene",
+     "x": "When the clock fills or the track fills, or the story says it's over, roll Finish the Scene. Strong hit: everyone's out. Weak hit: success with a minor cost. Miss: a dire turn. A success marks Heroics (one tick for Dangerous, two for Formidable or higher)."
+    }
+   ]
+  },
+  {
+   "id": "interrogate",
+   "title": "Interrogate a thug",
+   "summary": "Get a name out of someone who doesn't want to talk.",
+   "tip": "",
+   "steps": [
+    {
+     "t": "Choose your approach",
+     "m": "sf/compel",
+     "x": "Compel. Charm or make a deal +heart. Dangle them off a roof +iron. Bluff that their boss already sold them out +shadow. Strong hit: they talk, +1 momentum. Weak hit: they talk, but want something (protection, cash, to walk). Miss: they refuse or demand too much. Pay the Price."
+    },
+    {
+     "t": "Watch the Heat",
+     "m": "ss/heat",
+     "x": "Threats and violence draw attention. A miss on Compel is +1 Heat. Bloodthirsty or brutal methods add more. Vigilante helps if you hand them to a friendly cop instead."
+    },
+    {
+     "t": "Turn it into progress",
+     "m": "ss/work_the_case",
+     "x": "If this is part of a case, it can be a Work the Case +iron (shaking someone down) instead of a Compel, so it marks case progress directly. Pick one move, not both."
+    }
+   ]
+  },
+  {
+   "id": "downtime",
+   "title": "Between nights: recover and resupply",
+   "summary": "Patch up, clear your head, restock, and live your day life.",
+   "tip": "Your HQ lets you make recover moves there, but you can't Sojourn at it. Sojourn is for when you're out in the community.",
+   "steps": [
+    {
+     "t": "Patch up",
+     "m": "sf/heal",
+     "x": "Heal. Getting stitched up by your Caretaker or a friendly ER nurse is +iron (treated by someone else). Mending yourself uses +iron or +wits, whichever is lower. Medbay and Caretaker add bonuses."
+    },
+    {
+     "t": "Clear your head",
+     "m": "sf/hearten",
+     "x": "Hearten +heart: dinner with your family, a night at the bar with friends, time with someone who doesn't know about the mask. Caretaker and Independent help."
+    },
+    {
+     "t": "Restock",
+     "m": "sf/resupply",
+     "x": "Resupply for shared Resources: work a shift (+heart), sell seized goods to a fence (+shadow), scavenge parts (+wits). Kit and Gadgeteer let you move Resources into Kit."
+    },
+    {
+     "t": "Lie low",
+     "m": "ss/heat",
+     "x": "Skip patrolling for a session to lose 1 Heat. A press or police Connection covering for you also works."
+    },
+    {
+     "t": "Advance",
+     "m": "sf/earn_experience",
+     "x": "Each filled box on a legacy track (Quests, Bonds, Heroics) earns 2 XP. Spend XP to take new assets or upgrade abilities (Advance). Track spent XP on your hero sheet."
+    }
+   ]
+  },
+  {
+   "id": "two_players",
+   "title": "Playing with two heroes",
+   "summary": "Share the spotlight, help each other, and split up when the story wants it.",
+   "tip": "",
+   "steps": [
+    {
+     "t": "Take turns on the spotlight",
+     "m": null,
+     "x": "One player describes and rolls, then the other. When you're together, whoever is closest to the danger usually goes."
+    },
+    {
+     "t": "Help each other",
+     "m": "sf/aid_your_ally",
+     "x": "Aid Your Ally: Secure an Advantage or Gain Ground on your partner's behalf, and they take the benefit. In a fight, a strong hit on Gain Ground puts you both in control."
+    },
+    {
+     "t": "Split up",
+     "m": null,
+     "x": "Classic street-level move: one patrols, one works the case. Alternate scenes. Rolls and notes land in the shared journal, so nobody loses track."
+    },
+    {
+     "t": "Shared vows and tracks",
+     "m": "sf/swear_an_iron_vow",
+     "x": "A vow you both swear can be one shared track. Personal vows (your background vow) stay separate."
+    },
+    {
+     "t": "Resources are shared, Heat is not",
+     "m": null,
+     "x": "Spending Resources drains you both. Heat is personal, so one reckless hero can be on the front page while the other stays a rumor."
+    }
+   ]
+  },
+  {
+   "id": "nemesis",
+   "title": "When a Nemesis moves",
+   "summary": "Scheme clocks, the plot going off, and the revolving door.",
+   "tip": "",
+   "steps": [
+    {
+     "t": "Advance the scheme",
+     "m": "ss/scheme_clocks",
+     "x": "On a match with Go On Patrol, Gather Information or Work the Case, advance one Nemesis's scheme clock. Also when a session ends and they went unopposed."
+    },
+    {
+     "t": "The plot goes off",
+     "m": "ss/all_hell",
+     "x": "When the clock fills, roll All Hell Breaks Loose for how it hits the city, then Swear an Iron Vow (Extreme) to stop it or clean up after."
+    },
+    {
+     "t": "Lock them up",
+     "m": "ss/nemesis_escape",
+     "x": "When you beat them, tap Lock up on the Tracks tab. Their scheme clears."
+    },
+    {
+     "t": "They get out",
+     "m": "ss/nemesis_escape",
+     "x": "On a patrol match, run the escape check. On 1 to 3 on a d10, one locked-up Nemesis escapes, a rank tougher, with a new scheme. Generate villain on the Tracks tab rolls a fresh scheme if you need one."
+    }
+   ]
+  }
+ ]
+}

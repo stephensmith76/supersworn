@@ -1,9 +1,9 @@
 // Offline cache. Bump VERSION whenever app files change so phones pick up the update.
-const VERSION = 'ss-v2';
+const VERSION = 'ss-v3';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'css/styles.css',
   'js/app.js', 'js/store.js', 'js/rules.js', 'js/sync.js', 'js/ai.js',
-  'data/starforged.json', 'data/supersworn.json', 'data/villains.json', 'data/rules-notes.md',
+  'data/starforged.json', 'data/supersworn.json', 'data/villains.json', 'data/rules-notes.md', 'data/guides.json',
   'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png',
 ];
 self.addEventListener('install', e => {
