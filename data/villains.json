@@ -1,0 +1,1202 @@
+{
+ "oracles": [
+  {
+   "id": "ss/villain/rank",
+   "group": "Supersworn: Villains",
+   "name": "Villain Rank",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     25,
+     "Formidable"
+    ],
+    [
+     26,
+     90,
+     "Extreme"
+    ],
+    [
+     91,
+     100,
+     "Epic"
+    ]
+   ],
+   "field": "rank"
+  },
+  {
+   "id": "ss/villain/theme",
+   "group": "Supersworn: Villains",
+   "name": "Villain Theme",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     5,
+     "Clocks and time"
+    ],
+    [
+     6,
+     10,
+     "Fear"
+    ],
+    [
+     11,
+     15,
+     "Games and dice"
+    ],
+    [
+     16,
+     20,
+     "Birds of prey"
+    ],
+    [
+     21,
+     25,
+     "Fire and arson"
+    ],
+    [
+     26,
+     30,
+     "Plants and poison"
+    ],
+    [
+     31,
+     35,
+     "Money and debt"
+    ],
+    [
+     36,
+     40,
+     "Masks and faces"
+    ],
+    [
+     41,
+     45,
+     "Music and noise"
+    ],
+    [
+     46,
+     50,
+     "Rain and storms"
+    ],
+    [
+     51,
+     55,
+     "Insects and swarms"
+    ],
+    [
+     56,
+     60,
+     "Cold and frost"
+    ],
+    [
+     61,
+     65,
+     "Mirrors and lies"
+    ],
+    [
+     66,
+     70,
+     "Dolls and puppets"
+    ],
+    [
+     71,
+     75,
+     "Rats and sewers"
+    ],
+    [
+     76,
+     80,
+     "Electricity and blackouts"
+    ],
+    [
+     81,
+     85,
+     "Surgery and medicine"
+    ],
+    [
+     86,
+     90,
+     "Saints and sin"
+    ],
+    [
+     91,
+     95,
+     "Cards and luck"
+    ],
+    [
+     96,
+     100,
+     "Tattoos and ink"
+    ]
+   ],
+   "field": "theme"
+  },
+  {
+   "id": "ss/villain/source",
+   "group": "Supersworn: Villains",
+   "name": "Villain Source",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     35,
+     "Training"
+    ],
+    [
+     36,
+     65,
+     "Technology"
+    ],
+    [
+     66,
+     80,
+     "Chemical accident"
+    ],
+    [
+     81,
+     90,
+     "Experiment gone wrong"
+    ],
+    [
+     91,
+     100,
+     "Supernatural bargain"
+    ]
+   ],
+   "field": "source"
+  },
+  {
+   "id": "ss/villain/edge",
+   "group": "Supersworn: Villains",
+   "name": "Villain Edge",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     5,
+     "Master planner, always three moves ahead"
+    ],
+    [
+     6,
+     10,
+     "Brutal strength and a high pain threshold"
+    ],
+    [
+     11,
+     15,
+     "Chemical concoctions and gas"
+    ],
+    [
+     16,
+     20,
+     "Gadgets and deathtraps"
+    ],
+    [
+     21,
+     25,
+     "Hypnotic persuasion"
+    ],
+    [
+     26,
+     30,
+     "Acrobatics and blades"
+    ],
+    [
+     31,
+     35,
+     "Disguise and impersonation"
+    ],
+    [
+     36,
+     40,
+     "Hacking and surveillance"
+    ],
+    [
+     41,
+     45,
+     "Deadly marksmanship"
+    ],
+    [
+     46,
+     50,
+     "Trained animals"
+    ],
+    [
+     51,
+     55,
+     "Explosives"
+    ],
+    [
+     56,
+     60,
+     "Sonic weapon"
+    ],
+    [
+     61,
+     65,
+     "Armored suit"
+    ],
+    [
+     66,
+     70,
+     "Poisons and toxins"
+    ],
+    [
+     71,
+     75,
+     "Heals faster than they should"
+    ],
+    [
+     76,
+     80,
+     "Mind games and manipulation"
+    ],
+    [
+     81,
+     85,
+     "Holograms and illusion tech"
+    ],
+    [
+     86,
+     90,
+     "Controls a swarm"
+    ],
+    [
+     91,
+     95,
+     "Freeze or burn tech"
+    ],
+    [
+     96,
+     100,
+     "Knows everyone's secrets"
+    ]
+   ],
+   "field": "edge"
+  },
+  {
+   "id": "ss/villain/motive",
+   "group": "Supersworn: Villains",
+   "name": "Villain Motive",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     5,
+     "Revenge on the whole city"
+    ],
+    [
+     6,
+     10,
+     "Revenge on one specific person"
+    ],
+    [
+     11,
+     15,
+     "Money, and lots of it"
+    ],
+    [
+     16,
+     20,
+     "To be famous"
+    ],
+    [
+     21,
+     25,
+     "A twisted sense of justice"
+    ],
+    [
+     26,
+     30,
+     "Protecting someone they love"
+    ],
+    [
+     31,
+     35,
+     "A cause they believe in"
+    ],
+    [
+     36,
+     40,
+     "They think they're the hero"
+    ],
+    [
+     41,
+     45,
+     "Boredom"
+    ],
+    [
+     46,
+     50,
+     "A cure for themselves or someone else"
+    ],
+    [
+     51,
+     55,
+     "A lost love"
+    ],
+    [
+     56,
+     60,
+     "To rule the underworld"
+    ],
+    [
+     61,
+     65,
+     "To prove they're the smartest"
+    ],
+    [
+     66,
+     70,
+     "Punish the rich"
+    ],
+    [
+     71,
+     75,
+     "Cleanse the city of \"filth\""
+    ],
+    [
+     76,
+     80,
+     "Fear of dying"
+    ],
+    [
+     81,
+     85,
+     "A patron or voice tells them to"
+    ],
+    [
+     86,
+     90,
+     "Rebuild something that was taken"
+    ],
+    [
+     91,
+     95,
+     "Chaos for its own sake"
+    ],
+    [
+     96,
+     100,
+     "The family business"
+    ]
+   ],
+   "field": "motive"
+  },
+  {
+   "id": "ss/villain/scheme",
+   "group": "Supersworn: Villains",
+   "name": "Villain Scheme",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     5,
+     "Poison the water supply"
+    ],
+    [
+     6,
+     10,
+     "Take a gala full of elites hostage"
+    ],
+    [
+     11,
+     15,
+     "Rob every bank on one street in one night"
+    ],
+    [
+     16,
+     20,
+     "Seize control of the docks"
+    ],
+    [
+     21,
+     25,
+     "Blackmail the city council"
+    ],
+    [
+     26,
+     30,
+     "Frame a hero for murder"
+    ],
+    [
+     31,
+     35,
+     "Start a gang war"
+    ],
+    [
+     36,
+     40,
+     "Black out the city"
+    ],
+    [
+     41,
+     45,
+     "Kidnap a scientist"
+    ],
+    [
+     46,
+     50,
+     "Steal a prototype weapon"
+    ],
+    [
+     51,
+     55,
+     "Rig the election"
+    ],
+    [
+     56,
+     60,
+     "Burn down the old district"
+    ],
+    [
+     61,
+     65,
+     "Hold a hospital for ransom"
+    ],
+    [
+     66,
+     70,
+     "Unite the gangs under one banner"
+    ],
+    [
+     71,
+     75,
+     "Break someone out of prison"
+    ],
+    [
+     76,
+     80,
+     "Crash the city's finances"
+    ],
+    [
+     81,
+     85,
+     "Expose a hero's secret identity"
+    ],
+    [
+     86,
+     90,
+     "Trap citizens in a deadly game"
+    ],
+    [
+     91,
+     95,
+     "Steal a priceless museum piece"
+    ],
+    [
+     96,
+     100,
+     "Poison a public celebration"
+    ]
+   ],
+   "field": "scheme"
+  },
+  {
+   "id": "ss/villain/method",
+   "group": "Supersworn: Villains",
+   "name": "Villain Method",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     5,
+     "Elaborate traps"
+    ],
+    [
+     6,
+     10,
+     "Taunting calling cards and clues"
+    ],
+    [
+     11,
+     15,
+     "Works through proxies and patsies"
+    ],
+    [
+     16,
+     20,
+     "Broadcasts demands to the city"
+    ],
+    [
+     21,
+     25,
+     "Strikes only at midnight"
+    ],
+    [
+     26,
+     30,
+     "Street kids as lookouts"
+    ],
+    [
+     31,
+     35,
+     "Hides in plain sight with a day job"
+    ],
+    [
+     36,
+     40,
+     "Bribes cops and officials"
+    ],
+    [
+     41,
+     45,
+     "Theatrical public attacks"
+    ],
+    [
+     46,
+     50,
+     "Countdown timers"
+    ],
+    [
+     51,
+     55,
+     "Poses as a victim"
+    ],
+    [
+     56,
+     60,
+     "Sabotages infrastructure"
+    ],
+    [
+     61,
+     65,
+     "Takes hostages"
+    ],
+    [
+     66,
+     70,
+     "Turns heroes against each other"
+    ],
+    [
+     71,
+     75,
+     "Moves through the tunnels"
+    ],
+    [
+     76,
+     80,
+     "Uses the press against you"
+    ],
+    [
+     81,
+     85,
+     "Recruits the desperate"
+    ],
+    [
+     86,
+     90,
+     "Leaves no evidence at all"
+    ],
+    [
+     91,
+     95,
+     "Strikes many places at once"
+    ],
+    [
+     96,
+     100,
+     "Plays a long game over months"
+    ]
+   ],
+   "field": "method"
+  },
+  {
+   "id": "ss/villain/weakness",
+   "group": "Supersworn: Villains",
+   "name": "Villain Weakness",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     5,
+     "Arrogance"
+    ],
+    [
+     6,
+     10,
+     "An old injury"
+    ],
+    [
+     11,
+     15,
+     "Needs a rare chemical or part"
+    ],
+    [
+     16,
+     20,
+     "Can't resist an audience"
+    ],
+    [
+     21,
+     25,
+     "One person they won't hurt"
+    ],
+    [
+     26,
+     30,
+     "A strict personal code"
+    ],
+    [
+     31,
+     35,
+     "Paranoia"
+    ],
+    [
+     36,
+     40,
+     "Their gear needs recharging"
+    ],
+    [
+     41,
+     45,
+     "A specific fear"
+    ],
+    [
+     46,
+     50,
+     "Craves the thrill too much"
+    ],
+    [
+     51,
+     55,
+     "A lieutenant ready to betray them"
+    ],
+    [
+     56,
+     60,
+     "A sentimental object"
+    ],
+    [
+     61,
+     65,
+     "A predictable schedule"
+    ],
+    [
+     66,
+     70,
+     "Underestimates heroes"
+    ],
+    [
+     71,
+     75,
+     "Bright light"
+    ],
+    [
+     76,
+     80,
+     "A money trail"
+    ],
+    [
+     81,
+     85,
+     "Family"
+    ],
+    [
+     86,
+     90,
+     "Temper"
+    ],
+    [
+     91,
+     95,
+     "Always explains the plan"
+    ],
+    [
+     96,
+     100,
+     "Owes a dangerous creditor"
+    ]
+   ],
+   "field": "weakness"
+  },
+  {
+   "id": "ss/villain/lair",
+   "group": "Supersworn: Villains",
+   "name": "Villain Lair",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     5,
+     "Abandoned subway station"
+    ],
+    [
+     6,
+     10,
+     "Condemned theater"
+    ],
+    [
+     11,
+     15,
+     "Overgrown greenhouse"
+    ],
+    [
+     16,
+     20,
+     "Clock tower"
+    ],
+    [
+     21,
+     25,
+     "Shuttered amusement pier"
+    ],
+    [
+     26,
+     30,
+     "Meat-packing plant"
+    ],
+    [
+     31,
+     35,
+     "Cathedral bell tower"
+    ],
+    [
+     36,
+     40,
+     "Sewer junction"
+    ],
+    [
+     41,
+     45,
+     "Penthouse above the city"
+    ],
+    [
+     46,
+     50,
+     "Sunken ship in the harbor"
+    ],
+    [
+     51,
+     55,
+     "Closed asylum wing"
+    ],
+    [
+     56,
+     60,
+     "Shipping container maze"
+    ],
+    [
+     61,
+     65,
+     "Old radio station"
+    ],
+    [
+     66,
+     70,
+     "Bankrupt department store"
+    ],
+    [
+     71,
+     75,
+     "Flooded quarry"
+    ],
+    [
+     76,
+     80,
+     "Speakeasy under a bar"
+    ],
+    [
+     81,
+     85,
+     "Abandoned hospital"
+    ],
+    [
+     86,
+     90,
+     "Toy factory"
+    ],
+    [
+     91,
+     95,
+     "Observatory"
+    ],
+    [
+     96,
+     100,
+     "Power substation"
+    ]
+   ],
+   "field": "lair"
+  },
+  {
+   "id": "ss/villain/muscle",
+   "group": "Supersworn: Villains",
+   "name": "Villain Muscle",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     5,
+     "Masked thugs in matching outfits"
+    ],
+    [
+     6,
+     10,
+     "Ex-cons who owe them"
+    ],
+    [
+     11,
+     15,
+     "Hired mercenaries"
+    ],
+    [
+     16,
+     20,
+     "A small cult"
+    ],
+    [
+     21,
+     25,
+     "Trained animals"
+    ],
+    [
+     26,
+     30,
+     "Drones"
+    ],
+    [
+     31,
+     35,
+     "Gang recruits"
+    ],
+    [
+     36,
+     40,
+     "Crooked cops"
+    ],
+    [
+     41,
+     45,
+     "A trio of loyal lieutenants"
+    ],
+    [
+     46,
+     50,
+     "Bikers"
+    ],
+    [
+     51,
+     55,
+     "Ex-military"
+    ],
+    [
+     56,
+     60,
+     "Hackers"
+    ],
+    [
+     61,
+     65,
+     "Dock workers"
+    ],
+    [
+     66,
+     70,
+     "Bouncers and enforcers"
+    ],
+    [
+     71,
+     75,
+     "Hypnotized civilians"
+    ],
+    [
+     76,
+     80,
+     "Mob soldiers on loan"
+    ],
+    [
+     81,
+     85,
+     "Former victims"
+    ],
+    [
+     86,
+     90,
+     "Thrill-seeking rich kids"
+    ],
+    [
+     91,
+     95,
+     "Disgraced athletes"
+    ],
+    [
+     96,
+     100,
+     "Works alone"
+    ]
+   ],
+   "field": "muscle"
+  },
+  {
+   "id": "ss/villain/look",
+   "group": "Supersworn: Villains",
+   "name": "Villain Look",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     5,
+     "Pinstripe suit, perfect manners"
+    ],
+    [
+     6,
+     10,
+     "Hospital gown and bandages"
+    ],
+    [
+     11,
+     15,
+     "Patchwork mask"
+    ],
+    [
+     16,
+     20,
+     "Elegant gown and gloves"
+    ],
+    [
+     21,
+     25,
+     "Hazmat suit"
+    ],
+    [
+     26,
+     30,
+     "Long coat and wide hat"
+    ],
+    [
+     31,
+     35,
+     "Bright, cheerful colors"
+    ],
+    [
+     36,
+     40,
+     "All white, spotless"
+    ],
+    [
+     41,
+     45,
+     "Scarred face, no mask"
+    ],
+    [
+     46,
+     50,
+     "Armor made from scrap"
+    ],
+    [
+     51,
+     55,
+     "Porcelain mask"
+    ],
+    [
+     56,
+     60,
+     "Tattered formalwear"
+    ],
+    [
+     61,
+     65,
+     "Goggles and tool belt"
+    ],
+    [
+     66,
+     70,
+     "Hooded robes"
+    ],
+    [
+     71,
+     75,
+     "Looks completely ordinary"
+    ],
+    [
+     76,
+     80,
+     "Heavy chains"
+    ],
+    [
+     81,
+     85,
+     "Feathers or fur"
+    ],
+    [
+     86,
+     90,
+     "Glowing tubes and wires"
+    ],
+    [
+     91,
+     95,
+     "Uniform from a dead institution"
+    ],
+    [
+     96,
+     100,
+     "Mismatched eyes and a grin"
+    ]
+   ],
+   "field": "look"
+  },
+  {
+   "id": "ss/villain/card",
+   "group": "Supersworn: Villains",
+   "name": "Calling Card",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     5,
+     "A playing card"
+    ],
+    [
+     6,
+     10,
+     "A stopped watch"
+    ],
+    [
+     11,
+     15,
+     "A single feather"
+    ],
+    [
+     16,
+     20,
+     "A smiley face in paint"
+    ],
+    [
+     21,
+     25,
+     "A chess piece"
+    ],
+    [
+     26,
+     30,
+     "A dead flower"
+    ],
+    [
+     31,
+     35,
+     "A coin"
+    ],
+    [
+     36,
+     40,
+     "A nursery rhyme"
+    ],
+    [
+     41,
+     45,
+     "A burnt match"
+    ],
+    [
+     46,
+     50,
+     "A doll's head"
+    ],
+    [
+     51,
+     55,
+     "A tarot card"
+    ],
+    [
+     56,
+     60,
+     "A riddle on the wall"
+    ],
+    [
+     61,
+     65,
+     "A key"
+    ],
+    [
+     66,
+     70,
+     "A music box tune"
+    ],
+    [
+     71,
+     75,
+     "Frost on the windows"
+    ],
+    [
+     76,
+     80,
+     "A bar code tattoo on victims"
+    ],
+    [
+     81,
+     85,
+     "A smear of ink"
+    ],
+    [
+     86,
+     90,
+     "A ringing phone"
+    ],
+    [
+     91,
+     95,
+     "A photograph"
+    ],
+    [
+     96,
+     100,
+     "Nothing, and that's the signature"
+    ]
+   ],
+   "field": "card"
+  }
+ ],
+ "fields": [
+  [
+   "rank",
+   "Rank"
+  ],
+  [
+   "theme",
+   "Theme"
+  ],
+  [
+   "source",
+   "Source"
+  ],
+  [
+   "edge",
+   "Edge"
+  ],
+  [
+   "motive",
+   "Motive"
+  ],
+  [
+   "scheme",
+   "Scheme"
+  ],
+  [
+   "method",
+   "Method"
+  ],
+  [
+   "weakness",
+   "Weakness"
+  ],
+  [
+   "lair",
+   "Lair"
+  ],
+  [
+   "muscle",
+   "Muscle"
+  ],
+  [
+   "look",
+   "Look"
+  ],
+  [
+   "card",
+   "Calling card"
+  ]
+ ]
+}

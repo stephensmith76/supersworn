@@ -1,9 +1,9 @@
 // Offline cache. Bump VERSION whenever app files change so phones pick up the update.
-const VERSION = 'ss-v1';
+const VERSION = 'ss-v2';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'css/styles.css',
-  'js/app.js', 'js/store.js', 'js/rules.js', 'js/sync.js',
-  'data/starforged.json', 'data/supersworn.json',
+  'js/app.js', 'js/store.js', 'js/rules.js', 'js/sync.js', 'js/ai.js',
+  'data/starforged.json', 'data/supersworn.json', 'data/villains.json', 'data/rules-notes.md',
   'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png',
 ];
 self.addEventListener('install', e => {
@@ -18,7 +18,7 @@ self.addEventListener('fetch', e => {
   const url = new URL(req.url);
   const sameOrigin = url.origin === location.origin;
   const isFont = /fonts\.(googleapis|gstatic)\.com$/.test(url.hostname);
-  if (!sameOrigin && !isFont) return; // leave Firebase traffic alone
+  if (!sameOrigin && !isFont) return; // leave Firebase and AI traffic alone
   // App files: network first so updates land, cache when offline.
   e.respondWith(
     fetch(req).then(res => {

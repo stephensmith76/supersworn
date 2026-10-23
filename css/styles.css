@@ -182,3 +182,17 @@ code { background: var(--bg); padding: 1px 4px; border-radius: 4px; font-size: 1
 @media (min-width: 760px) {
   main { padding: 16px max(16px, calc((100vw - 720px) / 2)); }
 }
+nav { grid-template-columns: repeat(6, 1fr); }
+nav button { font-size: 16px; letter-spacing: .03em; }
+.villain .vrow { display: grid; grid-template-columns: 92px 1fr auto; gap: 8px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); }
+.villain .vrow:first-child { border-top: 0; }
+.vlabel { font: 17px/1 var(--display); letter-spacing: .05em; color: var(--accent); }
+.vval { font-size: 15px; }
+.sheet textarea { margin-top: 6px; }
+.chat { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+.msg { padding: 10px 12px; border-radius: 12px; max-width: 92%; }
+.msg.user { align-self: flex-end; background: var(--accent); color: var(--accent-ink); border-bottom-right-radius: 4px; }
+.msg.assistant { align-self: flex-start; background: var(--surface); border: 1px solid var(--line); border-bottom-left-radius: 4px; }
+.msg.assistant .btn { margin-top: 6px; }
+.msg.thinking { color: var(--muted); font-style: italic; }
+.ask { position: sticky; bottom: 0; }

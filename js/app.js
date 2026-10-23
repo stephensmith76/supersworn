@@ -4,15 +4,21 @@ import {
   rnd, RANKS, TICKS_PER_MARK, LEGACY_REWARD, MAX_TICKS, boxes, momentumLimits, HEAT_EFFECTS,
   actionRoll, progressRoll, RESULT_LABEL, ODDS, askOracle, rollOracle,
 } from './rules.js';
+import { AI_PROVIDERS, askRules } from './ai.js';
 
 // ---------- data ----------
 const D = { moves: [], oracles: [], assets: [], oracleById: {}, assetById: {}, moveById: {}, rules: {}, sources: [] };
 
 async function loadData() {
-  const [sf, ss] = await Promise.all([
+  const [sf, ss, vil, notes] = await Promise.all([
     fetch('data/starforged.json').then(r => r.json()),
     fetch('data/supersworn.json').then(r => r.json()),
+    fetch('data/villains.json').then(r => r.json()),
+    fetch('data/rules-notes.md').then(r => r.text()),
   ]);
+  D.villain = vil;
+  D.notes = notes;
+  ss.oracles = ss.oracles.concat(vil.oracles);
   // Rename Supply to Resources in Starforged text so the rules read the same as the hack.
   const resup = t => t.replace(/\bsupply\b/g, 'resources').replace(/\bSupply\b/g, 'Resources');
   D.rules = ss.rules;
@@ -212,7 +218,7 @@ function viewTracks() {
     ${clocks.map(c => clockBlock(['clocks', c.id], c)).join('') || '<p class="empty">Tension clocks for scene challenges and threats.</p>'}
   </section>
   <section class="card">
-    <div class="row between"><h3>Nemeses</h3><button class="btn sm" data-act="addNemesis">+ Nemesis</button></div>
+    <div class="row between"><h3>Nemeses</h3><span class="row"><button class="btn sm accent" data-act="genVillain">Generate villain</button><button class="btn sm" data-act="addNemesis">+ Nemesis</button></span></div>
     ${locked ? `<button class="btn" data-act="escapeCheck">Escape check (${locked} locked up): d10, 1 to 3 escapes</button>` : ''}
     ${nems.map(n => {
       const p = ['nemeses', n.id];
@@ -224,6 +230,7 @@ function viewTracks() {
           <select data-bind='${esc(JSON.stringify(p.concat('status')))}'><option value="large" ${n.status === 'large' ? 'selected' : ''}>At large</option><option value="locked" ${n.status === 'locked' ? 'selected' : ''}>Locked up</option><option value="retired" ${n.status === 'retired' ? 'selected' : ''}>Retired</option></select>
         </div>
         ${clockBlock(p, n, 'Scheme', true)}
+        <details class="sheet"><summary>Villain sheet</summary>${input(p.concat('sheet'), n.sheet || '', { area: true, placeholder: 'Motive, edge, method, weakness, lair, muscle, look, calling card' })}</details>
         <div class="row wrap">
           ${n.status === 'large' ? `<button class="btn sm" data-act="lockUp" data-id="${n.id}">Lock up</button>` : ''}
           <button class="btn sm danger" data-act="del" data-path='${esc(JSON.stringify(p))}'>Delete</button>
@@ -354,6 +361,35 @@ function viewOracles() {
   ${Object.entries(groups).map(([g, os]) => `<section class="card"><h4>${esc(g)}</h4><div class="chips">${os.map(o => `<button class="chip" data-act="rollOracle" data-id="${o.id}">${esc(o.name)}</button>`).join('')}</div></section>`).join('')}`;
 }
 
+function viewVillain() {
+  const v = ui.villain || {};
+  return `<div class="modal-head"><h3>Villain</h3><button class="btn sm" data-act="closeModal">Close</button></div>
+  <p class="hint">Name them yourselves. Tap a die to reroll one line.</p>
+  <section class="card villain">
+    ${D.villain.fields.map(([k, label]) => `<div class="vrow"><span class="vlabel">${esc(label)}</span><span class="vval">${esc(v[k] || '')}</span>
+      <button class="btn sm" data-act="rerollField" data-k="${k}" aria-label="Reroll ${esc(label)}">🎲</button></div>`).join('')}
+  </section>
+  <div class="row wrap"><button class="btn" data-act="genVillain">Reroll all</button><button class="btn accent" data-act="villainToNemesis">Add as Nemesis</button></div>`;
+}
+
+function viewAsk() {
+  const ai = aiReady();
+  const msgs = ui.chat || [];
+  return `<section class="card">
+    <h3>Rules questions</h3>
+    <p class="hint">Answers use the Supersworn and Starforged rules plus your current heroes, tracks and Nemeses. ${ai ? `Using ${esc(ai.label)}.` : ''}</p>
+    ${ai ? '' : `<p class="alert">Add an API key in settings (gear icon) to turn this on.</p>`}
+  </section>
+  <div class="chat">${msgs.map((m, i) => `<div class="msg ${m.role}">${m.role === 'user' ? esc(m.text) : md(m.text)}
+    ${m.role === 'assistant' && !m.error ? `<button class="btn sm" data-act="saveAnswer" data-i="${i}">Save to journal</button>` : ''}</div>`).join('')}
+    ${ui.asking ? '<div class="msg assistant thinking">Checking the rules…</div>' : ''}</div>
+  <section class="card ask">
+    <textarea id="askq" rows="2" placeholder="Can I burn momentum on a progress roll?" ${ai ? '' : 'disabled'}></textarea>
+    <div class="row wrap"><button class="btn accent" data-act="askSend" ${ai && !ui.asking ? '' : 'disabled'}>Ask</button>
+    ${msgs.length ? '<button class="btn sm" data-act="askClear">Clear chat</button>' : ''}</div>
+  </section>`;
+}
+
 function viewJournal() {
   const entries = sorted(S().journal).reverse();
   return `<section class="card">
@@ -389,6 +425,16 @@ function viewSettings() {
       <li>Copy the database URL from the top of the Data tab into the box above. Your friend pastes the same URL.</li></ol></details>
   </section>
   <section class="card">
+    <h4>Rules chat</h4>
+    <p class="hint">Pick a provider and paste your own API key. The key stays on this device and is never synced.</p>
+    <label class="field">Provider <select data-pref="aiProvider">${Object.entries(AI_PROVIDERS).map(([k, p]) => `<option value="${k}" ${store.prefs.aiProvider === k ? 'selected' : ''}>${esc(p.label)}</option>`).join('')}</select></label>
+    <label class="field">API key <input type="password" data-pref="aiKey" value="${esc(store.prefs.aiKey || '')}" placeholder="Paste key" autocomplete="off"></label>
+    <label class="field">Model <input data-pref="aiModel" value="${esc(store.prefs.aiModel || '')}" placeholder="${esc((AI_PROVIDERS[store.prefs.aiProvider || 'gemini'] || AI_PROVIDERS.gemini).model)}"></label>
+    <details><summary>Getting a key</summary><ul class="small">
+      <li><b>Gemini (free):</b> sign in at aistudio.google.com with a personal Google account and choose Get API key. The free tier is plenty for rules questions. Google may use free-tier chats to improve its products.</li>
+      <li><b>Claude:</b> make an account at console.anthropic.com, add a few dollars of credit, and create a key. This is separate from a Claude.ai subscription. A rules question costs about a cent.</li></ul></details>
+  </section>
+  <section class="card">
     <h4>Campaigns on this device</h4>
     ${camps.map(c => `<div class="row between"><span>${esc(c.name)}${c.id === S().meta.id ? ' <small>(open)</small>' : ''}</span>
       <span>${c.id !== S().meta.id ? `<button class="btn sm" data-act="switchCamp" data-id="${c.id}">Open</button> <button class="btn sm danger" data-act="delCamp" data-id="${c.id}">Delete</button>` : ''}</span></div>`).join('')}
@@ -403,7 +449,8 @@ function viewSettings() {
 }
 
 // ---------- render ----------
-const VIEWS = { heroes: viewHeroes, tracks: viewTracks, roll: viewRoll, oracles: viewOracles, journal: viewJournal };
+const VIEWS = { heroes: viewHeroes, tracks: viewTracks, roll: viewRoll, oracles: viewOracles, journal: viewJournal, ask: viewAsk };
+const MODALS = { assets: viewAssetPicker, settings: viewSettings, villain: viewVillain };
 const $view = () => document.getElementById('view');
 
 function render() {
@@ -411,7 +458,7 @@ function render() {
   if (!v) return;
   const scroll = v.scrollTop;
   const open = [...v.querySelectorAll('details[open] > summary')].map(s => s.textContent);
-  v.innerHTML = ui.modal === 'assets' ? viewAssetPicker() : ui.modal === 'settings' ? viewSettings() : VIEWS[ui.tab]();
+  v.innerHTML = MODALS[ui.modal] ? MODALS[ui.modal]() : (VIEWS[ui.tab] || viewHeroes)();
   for (const s of v.querySelectorAll('details > summary')) if (open.includes(s.textContent)) s.parentElement.open = true;
   v.scrollTop = scroll;
   document.getElementById('campname').textContent = S().meta.name;
@@ -473,7 +520,51 @@ function doOracle(id, quiet = false) {
   return { text: r.text, label };
 }
 
+function rollVillainField(k) {
+  const o = D.villain.oracles.find(x => x.field === k);
+  return rollOracle(o, D.oracleById).text;
+}
+
 const actions = {
+  genVillain() {
+    ui.villain = {};
+    for (const [k] of D.villain.fields) ui.villain[k] = rollVillainField(k);
+    ui.modal = 'villain'; render(); $view().scrollTop = 0;
+  },
+  rerollField(el) { ui.villain[el.dataset.k] = rollVillainField(el.dataset.k); render(); },
+  villainToNemesis() {
+    const v = ui.villain;
+    const rank = v.rank.toLowerCase();
+    const n = {
+      id: uid(), created: Date.now(), name: '', status: 'large', rank, segments: rank === 'formidable' ? 6 : 8, filled: 2,
+      gimmick: `${v.theme}. ${v.edge} (${v.source}).`, scheme: v.scheme,
+      sheet: D.villain.fields.filter(([k]) => !['rank', 'theme', 'scheme'].includes(k)).map(([k, l]) => `${l}: ${v[k]}`).join('\n'),
+    };
+    store.set(['nemeses', n.id], n);
+    log(`**A new villain emerges.** ${n.gimmick} Scheme: ${n.scheme}.`, 'oracle');
+    ui.modal = null; ui.tab = 'tracks'; saveUi(); render();
+  },
+  async askSend() {
+    const q = document.getElementById('askq');
+    const text = q.value.trim();
+    if (!text || ui.asking) return;
+    ui.chat = (ui.chat || []).concat({ role: 'user', text });
+    ui.asking = true; render();
+    try {
+      const answer = await askRules(ui.chat.filter(m => !m.error), buildContext());
+      ui.chat.push({ role: 'assistant', text: answer });
+    } catch (e) {
+      ui.chat.push({ role: 'assistant', text: e.message, error: true });
+    }
+    ui.asking = false; saveChat(); render();
+    $view().scrollTop = $view().scrollHeight;
+  },
+  askClear() { ui.chat = []; saveChat(); render(); },
+  saveAnswer(el) {
+    const a = ui.chat[+el.dataset.i], qn = ui.chat[+el.dataset.i - 1];
+    log(`**Rules: ${qn ? qn.text : ''}**\n\n${a.text}`, 'oracle');
+    el.textContent = 'Saved';
+  },
   inc(el) { const s = el.closest('.stepper'); const p = JSON.parse(s.dataset.path); const cur = p[0] === '__ui' ? ui[p[1]] : store.get(p) || 0; clampSet(p, cur + 1, +s.dataset.min, +s.dataset.max); },
   dec(el) { const s = el.closest('.stepper'); const p = JSON.parse(s.dataset.path); const cur = p[0] === '__ui' ? ui[p[1]] : store.get(p) || 0; clampSet(p, cur - 1, +s.dataset.min, +s.dataset.max); },
   pip(el) { store.set(JSON.parse(el.dataset.path), +el.dataset.v); },
@@ -584,6 +675,41 @@ const actions = {
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   },
 };
+
+function saveChat() { try { localStorage.setItem('ss.chat', JSON.stringify((ui.chat || []).slice(-30))); } catch { /* ignore */ } }
+try { ui.chat = JSON.parse(localStorage.getItem('ss.chat') || '[]'); } catch { ui.chat = []; }
+
+function aiReady() {
+  const p = AI_PROVIDERS[store.prefs.aiProvider || 'gemini'];
+  return store.prefs.aiKey && p ? p : null;
+}
+
+// Static rules go first (cacheable); the live game state goes second.
+let rulesText = null;
+function buildContext() {
+  if (!rulesText) {
+    const ss = D.moves.filter(m => m.id.startsWith('ss/')).map(m => `### ${m.name} (Supersworn)\n${m.text}`).join('\n\n');
+    const sf = D.moves.filter(m => m.id.startsWith('sf/')).map(m => `### ${m.name} (Starforged, ${m.cat})\n${m.text}`).join('\n\n');
+    const assets = D.assets.filter(a => a.id.startsWith('ss/')).map(a => `### ${a.name} (${a.cat})\n${a.requirement ? a.requirement + '\n' : ''}${a.note ? a.note + '\n' : ''}${a.abilities.map((t, i) => `${i + 1}. ${t}`).join('\n')}`).join('\n\n');
+    rulesText = `${D.notes}\n\n## Moves\n\n${ss}\n\n${sf}\n\n## Supersworn assets\n\n${assets}`;
+  }
+  const s = S();
+  const heroLines = sorted(s.heroes).map(h => {
+    const lim = momentumLimits(h);
+    const as = sorted(h.assets).map(inst => {
+      const a = D.assetById[inst.ref];
+      if (!a) return '';
+      const on = a.abilities.map((t, i) => ((inst.enabled || {})['a' + i] ? `   - [x] ${t}` : null)).filter(Boolean).join('\n');
+      return `  - ${a.name} (${a.cat})${Object.keys(inst.meters || {}).length ? ' ' + JSON.stringify(inst.meters) : ''}\n${on}`;
+    }).join('\n');
+    return `- ${h.name}: edge ${h.stats.edge}, heart ${h.stats.heart}, iron ${h.stats.iron}, shadow ${h.stats.shadow}, wits ${h.stats.wits}; health ${h.health}, spirit ${h.spirit}, momentum ${h.momentum} (max ${lim.max}, reset ${lim.reset}), heat ${h.heat}; impacts: ${Object.keys(h.impacts).filter(k => h.impacts[k]).join(', ') || 'none'}\n  Assets (enabled abilities marked):\n${as}`;
+  }).join('\n');
+  const tracks = sorted(s.tracks).filter(t => !t.done).map(t => `- ${t.name || '(unnamed)'}: ${t.rank} ${t.type}, ${boxes(t.ticks)} boxes (${t.ticks} ticks)`).join('\n');
+  const nems = sorted(s.nemeses).map(n => `- ${n.name || '(unnamed)'}: ${n.rank}, ${n.status}, scheme "${n.scheme}" ${n.filled}/${n.segments}. ${n.gimmick}`).join('\n');
+  const recent = sorted(s.journal).slice(-6).map(e => `- ${e.text.replace(/\n/g, ' ')}`).join('\n');
+  const state = `## Current game\nShared Resources: ${s.shared.resources}\n\nHeroes:\n${heroLines || 'none'}\n\nOpen tracks:\n${tracks || 'none'}\n\nNemeses:\n${nems || 'none'}\n\nRecent journal:\n${recent || 'none'}`;
+  return { rules: rulesText, state };
+}
 
 function showErr(msg) { const e = document.getElementById('syncerr'); if (e) e.textContent = msg; }
 
