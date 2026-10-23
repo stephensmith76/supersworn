@@ -4,7 +4,7 @@ The app has six tabs along the bottom (Heroes, Tracks, Roll, Oracles, Journal, H
 
 ## Heroes tab
 - Shared card at the top: the shared Resources meter (replaces supply). Tap + or − to change it.
-- Hero chips: tap a name to switch heroes. "+ Hero" adds a new one (stats start at 0; set them to 3, 2, 2, 1, 1 with the + buttons).
+- Hero chips: tap a name to switch heroes. "+ Hero" opens the character creation walkthrough: pick one of seven archetypes (Masked brawler, Ex-cop gone rogue, Hacker in a van, Reformed thief, Night-shift medic, Reporter with a mask, Occult detective) or build your own, name the hero, assign stats 3, 2, 2, 1, 1 with the menus, choose a Power and Source, a Path and one more asset (HQ is added automatically), and write an Epic background vow plus an optional current vow. "Create hero" adds the hero, their assets and their vow tracks. "Skip and make a blank hero instead" makes an empty sheet.
 - Name and "Who they are by day" fields: type, then tap elsewhere to save.
 - Stats: + and − on each of edge, heart, iron, shadow, wits.
 - Meters: tap a square to set Health, Spirit or Heat to that value (tap the highest filled square again to lower it by one). Momentum uses + and −, and "Reset" sets it to the reset value. The max and reset values update automatically from marked impacts.
@@ -23,6 +23,8 @@ The app has six tabs along the bottom (Heroes, Tracks, Roll, Oracles, Journal, H
 
 ## Roll tab
 - Action roll: pick the hero, optionally a move (this picks its usual stat), then the stat to roll (stats, health, spirit, shared Resources, or any asset meter like Kit), and adds with + and −. Tap "Roll". The result card shows the dice, strong hit, weak hit or miss, and any match. If burning momentum would improve the result, a "Burn momentum" button appears; tapping it resets momentum and updates the result. Negative momentum cancelling the action die is handled automatically.
+- One-tap results: when a common move is picked (Face Danger, Secure an Advantage, Gather Information, Compel, the fight moves, Endure Harm and Stress, Heal, Hearten, Resupply, Swear an Iron Vow, Go On Patrol, Work the Case and the scene challenge moves), the result card shows buttons for what that result lets you do: momentum and meter changes, "Suffer" buttons for momentum, health, spirit or Resources, "Mark progress" on the right track, In control or Bad spot, filling a clock, Pay the Price, rolling Trouble or a Clue, advancing a Nemesis scheme, Uncover a Plot, and the escape check on a patrol match. "Choose one" groups disable the rest once you pick. Nothing happens until you tap, and every tap is logged in the journal. If the right kind of track doesn't exist yet, a "New ... track" button makes one.
+- Progress rolls get buttons too, based on the track type: fights (Take Decisive Action), patrols (Finish Patrol, with the Heroics reward and Heat), cases (Solve the Case, with the vow milestone), vows (Fulfill Your Vow, with the Quests reward), connections (Forge a Bond) and scene challenges (Finish the Scene). A fight rolled from a bad spot is downgraded automatically. Misses offer the move's options, such as clearing boxes equal to the lower challenge die and raising the rank.
 - The chosen move's full text appears under the roll, with buttons to roll any oracles it uses.
 - Progress roll: a button for each open track.
 - Ask the Oracle: Almost certain, Likely, 50/50, Unlikely, Small chance. Plus quick d6, d10 and d100 buttons.
@@ -33,6 +35,7 @@ The app has six tabs along the bottom (Heroes, Tracks, Roll, Oracles, Journal, H
 - Search box, then every table grouped: Supersworn (Trouble, Plot, Clue, All Hell Breaks Loose, Community, Trouble Building), City Location, Villains, and the Starforged core, character, faction and misc tables. Tap any table to roll it.
 
 ## Journal tab
+- Session bar at the top. "Begin session" shows the last recap, the Begin a Session checklist, a "Roll a spotlight" button and "Everyone +1 momentum", then "Start the session" bumps the session number. "End session" walks through End a Session: missed progress, advancing schemes for Nemeses who went unopposed, a focus for next time (+1 momentum), and a recap. With an AI key set, "Draft recap from the journal" writes a "previously on" from tonight's entries. Edit it, then "Save recap".
 - Type a note and tap "Add to journal". Every roll, oracle result, escape check and saved rules answer is logged automatically with who did it and when. Both players see the same journal when syncing. The × on an entry deletes it (two taps).
 
 ## Help tab
@@ -44,7 +47,8 @@ The app has six tabs along the bottom (Heroes, Tracks, Roll, Oracles, Journal, H
 - Campaign name and City name.
 - Play together remotely: paste the Firebase database URL. One player taps "Host this campaign" and reads out the six-character session code. The other types it in and taps "Join". "Stop syncing" disconnects. Changes made offline are saved and sent on reconnect. Firebase setup steps are under "Firebase setup".
 - Rules chat: provider (Google Gemini or Anthropic Claude), API key and optional model name. Keys stay on the device and are never synced.
-- Campaigns on this device: open, delete, "New campaign", "Export backup" (downloads a JSON file) and "Import backup".
+- Campaigns: "Choose campaign" (or tap the campaign name at the top of the screen) opens the campaign chooser. It lists every campaign on this device with its game, city, session number, heroes and last played date, plus Open and Delete. The open campaign's name can be edited there. "New campaign" takes a name and a game (only Supersworn: Street Level for now). "Export backup" downloads a JSON file and "Import backup" loads one.
+- Playing in the same room doesn't need Firebase: share one phone, or keep heroes on separate phones and merge with Export and Import.
 
 ## Installing
 Open the app link in Chrome on Android, tap the three-dot menu and choose "Add to Home screen" or "Install app". After the first visit it works offline, except syncing and the rules chat.

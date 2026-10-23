@@ -1,9 +1,9 @@
 // Offline cache. Bump VERSION when app files change so old caches are cleared.
 const PREFIX = 'ss-';
-const VERSION = PREFIX + 'v4';
+const VERSION = PREFIX + 'v5';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'css/styles.css',
-  'js/app.js', 'js/store.js', 'js/rules.js', 'js/sync.js', 'js/ai.js',
+  'js/app.js', 'js/store.js', 'js/rules.js', 'js/sync.js', 'js/ai.js', 'js/effects.js',
   'data/starforged.json', 'data/supersworn.json', 'data/villains.json', 'data/rules-notes.md', 'data/guides.json', 'data/app-guide.md',
   'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable.png',
 ];

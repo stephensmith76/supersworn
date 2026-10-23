@@ -5,6 +5,10 @@ import {
   actionRoll, progressRoll, RESULT_LABEL, ODDS, askOracle, rollOracle,
 } from './rules.js';
 import { AI_PROVIDERS, askRules } from './ai.js';
+import { effectsFor } from './effects.js';
+
+export const GAMES = [{ id: 'supersworn', name: 'Supersworn: Street Level' }];
+const gameName = id => (GAMES.find(g => g.id === id) || { name: id }).name;
 
 // ---------- data ----------
 const D = { moves: [], oracles: [], assets: [], oracleById: {}, assetById: {}, moveById: {}, rules: {}, sources: [] };
@@ -112,8 +116,9 @@ function viewHeroes() {
     <div class="row between"><h3>Shared</h3>${stepper(['shared', 'resources'], S().shared.resources, { label: 'Resources' })}</div>
   </section>
   <div class="chips">${hs.map(x => `<button class="chip ${h && x.id === h.id ? 'on' : ''}" data-act="pickHero" data-id="${x.id}">${esc(x.name || 'Unnamed')}</button>`).join('')}
-    <button class="chip add" data-act="addHero">+ Hero</button></div>`;
-  if (!h) return out + `<p class="empty">No heroes yet. Add one to start, or open settings to join your partner's campaign.</p>`;
+    <button class="chip add" data-act="openCreate">+ Hero</button></div>`;
+  if (!h) return out + `<section class="card"><p>No heroes yet.</p><button class="btn accent" data-act="openCreate">Create a hero</button>
+    <p class="hint">Joining your partner's game instead? Open settings (gear icon).</p></section>`;
   const P = k => ['heroes', h.id, k];
   const lim = momentumLimits(h);
   const xpEarned = Object.values(h.legacies).reduce((a, t) => a + boxes(t) * 2, 0);
@@ -294,6 +299,7 @@ function rollCard(r) {
     ${r.cancelled ? '<p class="small">Negative momentum cancelled the action die.</p>' : ''}
     ${r.label ? `<p class="small">${esc(r.label)}</p>` : ''}
     ${r.burn && !r.burned ? `<button class="btn accent" data-act="burn">Burn momentum: ${RESULT_LABEL[r.burn.result]}</button>` : ''}
+    ${fxPanel(r)}
     ${r.match ? `<p class="small">${r.kind === 'action' ? 'A match: check scheme clocks, and Nemesis escapes if you were patrolling.' : 'A match: something unexpected happens, for good or ill.'}</p>` : ''}
   </div>`;
 }
@@ -404,7 +410,12 @@ function viewAsk() {
 
 function viewJournal() {
   const entries = sorted(S().journal).reverse();
-  return `<section class="card">
+  const n = S().shared.session;
+  return `<section class="card session">
+    <div class="row between"><h3>${n ? `Session ${n}` : 'No session yet'}</h3>
+    <span class="row"><button class="btn sm accent" data-act="openBegin">Begin session</button><button class="btn sm" data-act="openEnd" ${n ? '' : 'disabled'}>End session</button></span></div>
+  </section>
+  <section class="card">
     <textarea id="jtext" data-draft="1" rows="3" placeholder="What happens next?">${esc(ui.drafts.jtext || '')}</textarea>
     <button class="btn accent" data-act="addEntry">Add to journal</button>
   </section>
@@ -450,10 +461,9 @@ function viewSettings() {
       <li><b>Claude:</b> make an account at console.anthropic.com, add a few dollars of credit, and create a key. This is separate from a Claude.ai subscription. A rules question costs about a cent.</li></ul></details>
   </section>
   <section class="card">
-    <h4>Campaigns on this device</h4>
-    ${camps.map(c => `<div class="row between"><span>${esc(c.name)}${c.id === S().meta.id ? ' <small>(open)</small>' : ''}</span>
-      <span>${c.id !== S().meta.id ? `<button class="btn sm" data-act="switchCamp" data-id="${c.id}">Open</button> <button class="btn sm danger" data-act="delCamp" data-id="${c.id}">Delete</button>` : ''}</span></div>`).join('')}
-    <div class="row wrap"><button class="btn" data-act="newCamp">New campaign</button>
+    <h4>Campaigns</h4>
+    <p class="hint">${camps.length} on this device. You can also tap the campaign name at the top.</p>
+    <div class="row wrap"><button class="btn" data-act="openCampaigns">Choose campaign</button>
       <button class="btn" data-act="export">Export backup</button>
       <label class="btn">Import backup<input type="file" id="importfile" accept="application/json" hidden></label></div>
   </section>
@@ -465,7 +475,7 @@ function viewSettings() {
 
 // ---------- render ----------
 const VIEWS = { heroes: viewHeroes, tracks: viewTracks, roll: viewRoll, oracles: viewOracles, journal: viewJournal, ask: viewAsk };
-const MODALS = { assets: viewAssetPicker, settings: viewSettings, villain: viewVillain };
+const MODALS = { assets: viewAssetPicker, settings: viewSettings, villain: viewVillain, create: viewCreate, campaigns: viewCampaigns, begin: viewBegin, end: viewEnd };
 const $view = () => document.getElementById('view');
 
 function render() {
@@ -517,6 +527,8 @@ function doActionRoll() {
   const r = actionRoll({ stat: opt[2], adds: ui.rollAdds, momentum: h.momentum });
   const move = D.moveById[ui.moveId];
   r.heroId = h.id;
+  r.moveId = ui.moveId;
+  r.applied = {};
   r.label = `${h.name}: ${move ? move.name + ', ' : ''}+${opt[1]}`;
   ui.lastRoll = r;
   log(`**${RESULT_LABEL[r.result]}${r.match ? ' (match)' : ''}** ${r.label}\nAction ${r.cancelled ? '0 (cancelled)' : r.a} + ${r.stat}${r.adds ? ' + ' + r.adds : ''} = ${r.score} vs ${r.c1}, ${r.c2}`, 'roll');
@@ -527,7 +539,16 @@ function doProgressRoll(id) {
   if (!t) return;
   const r = progressRoll({ ticks: t.ticks });
   r.trackId = id;
+  r.applied = {};
+  const hh = S().heroes[ui.rollHero] || currentHero();
+  r.heroId = hh ? hh.id : null;
   r.label = `${t.name || t.type} (${t.rank} ${t.type})`;
+  // Take Decisive Action from a bad spot: strong hit without a match counts as weak, weak as miss.
+  if (t.type === 'combat' && t.position === 'bad' && r.result !== 'miss') {
+    const was = r.result;
+    r.result = r.result === 'strong' && !r.match ? 'weak' : r.result === 'weak' ? 'miss' : r.result;
+    if (r.result !== was) r.label += `. In a bad spot: ${RESULT_LABEL[was].toLowerCase()} counts as ${RESULT_LABEL[r.result].toLowerCase()}`;
+  }
   ui.lastRoll = r;
   log(`**${RESULT_LABEL[r.result]}${r.match ? ' (match)' : ''}** Progress roll: ${r.label}\nProgress ${r.score} vs ${r.c1}, ${r.c2}`, 'roll');
 }
@@ -711,9 +732,59 @@ const actions = {
     try { await sync.join(c); ui.modal = null; log(`${me()} joined.`); render(); } catch (e) { showErr(e.message); }
   },
   leave() { sync.leave(); render(); },
-  switchCamp(el) { sync.leave(); store.switchTo(el.dataset.id); ui.heroId = null; render(); },
+  switchCamp(el) { sync.leave(); store.switchTo(el.dataset.id); ui.heroId = null; ui.rollHero = null; ui.lastRoll = null; ui.modal = null; ui.tab = 'heroes'; saveUi(); render(); },
   delCamp(el) { if (confirmTwice(el)) { store.deleteCampaign(el.dataset.id); render(); } },
-  newCamp() { sync.leave(); store.newCampaign('New campaign'); ui.heroId = null; render(); },
+  newCamp() {
+    const name = (document.getElementById('newcampname') || {}).value || 'New campaign';
+    const game = (document.getElementById('newcampgame') || {}).value || 'supersworn';
+    sync.leave(); store.newCampaign(name.trim() || 'New campaign', game); ui.heroId = null; ui.modal = null; ui.tab = 'heroes'; saveUi(); render();
+  },
+  openCampaigns() { ui.modal = 'campaigns'; render(); $view().scrollTop = 0; },
+  openCreate() { ui.cw = newWizard(); ui.modal = 'create'; render(); $view().scrollTop = 0; },
+  cwArchetype(el) { applyArchetype(el.dataset.id); render(); },
+  cwBlank() { actions.addHero(); ui.modal = null; render(); },
+  cwCreate() { createFromWizard(); },
+  openBegin() { ui.modal = 'begin'; ui.beginDone = {}; render(); $view().scrollTop = 0; },
+  openEnd() { ui.modal = 'end'; ui.endDone = {}; ui.recapDraft = ui.recapDraft || ''; render(); $view().scrollTop = 0; },
+  beginSession() {
+    const n = S().shared.session + 1;
+    store.set(['shared', 'session'], n);
+    store.set(['shared', 'sessionStart'], Date.now());
+    log(`**Session ${n} begins.**`, 'session');
+    ui.beginDone.started = true; render();
+  },
+  beginSpotlight() { doOracle('sf/moves/begin_a_session'); ui.beginDone.spot = true; render(); },
+  allMomentum(el) {
+    for (const h of heroes()) store.set(['heroes', h.id, 'momentum'], Math.min(momentumLimits(h).max, h.momentum + 1));
+    log('Everyone takes +1 momentum.', 'roll');
+    (el.dataset.which === 'end' ? ui.endDone : ui.beginDone).mom = true; render();
+  },
+  endAdvance(el) {
+    const n = S().nemeses[el.dataset.id];
+    if (!n) return;
+    store.set(['nemeses', n.id, 'filled'], Math.min(n.segments, n.filled + 1));
+    log(`${n.name || 'A Nemesis'} went unopposed. Scheme ${Math.min(n.segments, n.filled + 1)}/${n.segments}.`, 'roll');
+    ui.endDone['n' + n.id] = true; render();
+  },
+  async genRecap(el) {
+    if (!aiReady()) return;
+    const since = S().shared.sessionStart || 0;
+    const lines = sorted(S().journal).filter(e => e.created >= since && e.kind !== 'recap').map(e => `- ${e.author}: ${e.text.replace(/\n/g, ' ')}`).join('\n');
+    if (!lines) { ui.recapDraft = 'Nothing in the journal this session yet.'; render(); return; }
+    el.disabled = true; el.textContent = 'Writing…';
+    try {
+      ui.recapDraft = await askRules([{ role: 'user', text: `Write a short "previously on" recap of this session for the two players, in 4 to 6 sentences of plain past-tense story (no rules talk, no dice numbers, no bullet points, no em dashes). Then one line starting "Loose ends:" listing open threads. Journal:\n${lines}` }], buildContext());
+    } catch (e) { ui.recapDraft = 'Could not write a recap: ' + e.message; }
+    render();
+  },
+  saveRecap() {
+    const t = document.getElementById('recaptext');
+    const text = (t ? t.value : ui.recapDraft || '').trim();
+    if (!text) return;
+    log(`**Recap of session ${S().shared.session}.**\n\n${text}`, 'recap');
+    ui.recapDraft = ''; ui.endDone.recap = true; render();
+  },
+  fx(el) { applyFx(el); },
   export() {
     const blob = new Blob([JSON.stringify(S(), null, 1)], { type: 'application/json' });
     const a = document.createElement('a');
@@ -759,6 +830,375 @@ function buildContext() {
   return { rules: rulesText, state };
 }
 
+// ---------- one-tap results ----------
+const METER_LABEL = { mom: 'momentum', health: 'health', spirit: 'spirit', res: 'Resources', heat: 'Heat' };
+const signed = n => (n > 0 ? '+' + n : '−' + -n);
+const rankShift = (rank, d) => RANKS[Math.max(-1, RANKS.indexOf(rank) - d)];
+const LEGACY_TICKS = { troublesome: 1, dangerous: 2, formidable: 4, extreme: 8, epic: 12 };
+
+function fxContext(r) {
+  return { hero: S().heroes[r.heroId] || null, track: r.trackId ? S().tracks[r.trackId] : null };
+}
+
+function openTracks(type) { return sorted(S().tracks).filter(t => !t.done && t.type === type); }
+
+function fxButton(label, key, arg, disabled, cls = '') {
+  return `<button class="btn sm fx ${cls}" data-act="fx" data-k="${esc(key)}" data-arg="${esc(arg || '')}" ${disabled ? 'disabled' : ''}>${esc(label)}</button>`;
+}
+
+function fxItem(e, key, r, off) {
+  const { hero, track } = fxContext(r);
+  switch (e.t) {
+    case 'note': return `<p class="fxnote">${esc(e.text)}</p>`;
+    case 'mom': case 'health': case 'spirit': case 'res': case 'heat':
+      return fxButton(`${signed(e.n)} ${METER_LABEL[e.t]}`, key, '', off);
+    case 'suffer':
+      return `<span class="fxgroup"><span class="fxlabel">Suffer ${signed(-e.n)}:</span>${['mom', 'health', 'spirit', 'res'].map(m => fxButton(METER_LABEL[m], key, m, off)).join('')}</span>`;
+    case 'tradeMomFor': return fxButton(`−1 momentum, +1 ${e.meter}`, key, '', off);
+    case 'progress': {
+      const ts = openTracks(e.type);
+      if (!ts.length) return fxButton(`New ${e.type} track`, key + ':new', e.type, false, 'ghost');
+      return ts.map(t => fxButton(`Mark progress${e.n > 1 ? ' ×' + e.n : ''}: ${t.name || t.type}`, key, t.id, off)).join('');
+    }
+    case 'pos': {
+      const ts = openTracks('combat');
+      return ts.map(t => fxButton(`${e.v === 'bad' ? 'Bad spot' : 'In control'}${ts.length > 1 ? ': ' + (t.name || 'fight') : ''}`, key, t.id, off, e.v === 'bad' ? 'warn' : '')).join('');
+    }
+    case 'clock': {
+      const cs = sorted(S().clocks).filter(c => c.filled < c.segments);
+      if (!cs.length) return '<p class="fxnote">No open clock. Add one on the Tracks tab.</p>';
+      return cs.map(c => fxButton(`Fill ${e.n}: ${c.name || 'clock'}`, key, c.id, off, 'warn')).join('');
+    }
+    case 'nextAdd': return fxButton('+1 on next roll', key, '', off);
+    case 'oracle': return fxButton(`Roll ${(D.oracleById[e.id] || {}).name || 'oracle'}`, key, '', off);
+    case 'ptp': return fxButton('Pay the Price', key, '', off, 'warn');
+    case 'nemesis': {
+      const ns = sorted(S().nemeses).filter(n => n.status === 'large' && n.filled < n.segments);
+      return ns.map(n => fxButton(`Advance scheme: ${n.name || 'Nemesis'}`, key, n.id, off, 'warn')).join('');
+    }
+    case 'escape': return sorted(S().nemeses).some(n => n.status === 'locked') ? fxButton('Escape check', key, '', off, 'warn') : '';
+    case 'plot': return fxButton('Uncover a Plot', key, '', off);
+    case 'legacy': {
+      const rank = track && rankShift(track.rank, e.d);
+      const ticks = rank ? LEGACY_TICKS[rank] : 0;
+      return ticks ? fxButton(`${cap(e.l)} +${ticks} tick${ticks === 1 ? '' : 's'}`, key, '', off) : `<p class="fxnote">No ${e.l} reward at this rank.</p>`;
+    }
+    case 'heroicsScene': {
+      const ticks = track ? (track.rank === 'troublesome' ? 0 : track.rank === 'dangerous' ? 1 : 2) : 0;
+      return ticks ? fxButton(`Heroics +${ticks} tick${ticks === 1 ? '' : 's'}`, key, '', off) : '';
+    }
+    case 'milestone': {
+      const vs = openTracks('vow');
+      return vs.length ? vs.map(v => fxButton(`Milestone: ${v.name || 'vow'}`, key, v.id, off)).join('') : '<p class="fxnote">No open vow to mark a milestone on.</p>';
+    }
+    case 'done': return track ? fxButton('Mark track done', key, '', off || track.done) : '';
+    case 'setback': {
+      const n = Math.min(r.c1, r.c2);
+      return fxButton(`Keep at it: clear ${n} box${n === 1 ? '' : 'es'}, raise rank`, key, '', off);
+    }
+    case 'abandon': return fxButton('Abandon: Pay the Price, +1 Heat', key, '', off, 'warn');
+    case 'wrongPerson': return fxButton('Wrong person: +2 Heat, Pay the Price', key, '', off, 'warn');
+    case 'forsake': return fxButton('Forsake the vow', key, '', off, 'warn');
+    case 'newTrack': return openTracks(e.type).length ? '' : fxButton(`New ${e.type} track`, key, e.type, off, 'ghost');
+    default: return '';
+  }
+}
+
+function fxPanel(r) {
+  const fx = effectsFor(r, r.trackId ? S().tracks[r.trackId] : null);
+  if (!fx || !fx.list.length) return '';
+  const a = r.applied || {};
+  const items = fx.list.map((e, i) => {
+    if (e.choose) {
+      const used = e.options.filter((_, j) => a[`${i}.${j}`]).length;
+      const full = used >= e.choose;
+      return `<div class="fxchoose"><span class="fxlabel">Choose ${e.choose === 1 ? 'one' : e.choose}:</span>${e.options.map((o, j) => fxItem(o, `${i}.${j}`, r, a[`${i}.${j}`] || full)).join('')}</div>`;
+    }
+    return fxItem(e, String(i), r, a[String(i)]);
+  }).join('');
+  return `<div class="fxpanel">${fx.name ? `<div class="fxlabel">${esc(fx.name)}</div>` : ''}${items}</div>`;
+}
+
+function findFx(r, key) {
+  const fx = effectsFor(r, r.trackId ? S().tracks[r.trackId] : null);
+  if (!fx) return null;
+  const [i, j] = key.split(':')[0].split('.').map(Number);
+  const e = fx.list[i];
+  return j === undefined ? e : e && e.options && e.options[j];
+}
+
+function bumpMeter(hero, meter, n) {
+  if (meter === 'res') {
+    store.set(['shared', 'resources'], Math.max(0, Math.min(5, S().shared.resources + n)));
+    return `Resources ${signed(n)}`;
+  }
+  if (!hero) return '';
+  if (meter === 'mom') {
+    const lim = momentumLimits(hero);
+    store.set(['heroes', hero.id, 'momentum'], Math.max(-6, Math.min(lim.max, hero.momentum + n)));
+    return `${hero.name}: momentum ${signed(n)}`;
+  }
+  const max = meter === 'heat' ? 5 : meter === 'health' && Object.values(hero.assets).some(x => x.ref === 'ss/power_toughness') ? 6 : 5;
+  store.set(['heroes', hero.id, meter], Math.max(0, Math.min(max, hero[meter] + n)));
+  return `${hero.name}: ${METER_LABEL[meter]} ${signed(n)}`;
+}
+
+function applyFx(el) {
+  const r = ui.lastRoll;
+  if (!r) return;
+  const key = el.dataset.k, arg = el.dataset.arg;
+  const e = findFx(r, key);
+  if (!e) return;
+  const { hero, track } = fxContext(r);
+  const said = [];
+  const say = t => { if (t) said.push(t); };
+  if (key.endsWith(':new')) {
+    const t = { id: uid(), created: Date.now(), name: '', type: arg, rank: 'dangerous', ticks: 0, done: false };
+    store.set(['tracks', t.id], t);
+    render();
+    return; // creating a track does not use up the effect
+  }
+  switch (e.t) {
+    case 'mom': case 'health': case 'spirit': case 'res': case 'heat': say(bumpMeter(hero, e.t, e.n)); break;
+    case 'suffer': say(bumpMeter(hero, arg, -e.n)); break;
+    case 'tradeMomFor': say(bumpMeter(hero, 'mom', -1)); say(bumpMeter(hero, e.meter, 1)); break;
+    case 'progress': {
+      const t = S().tracks[arg];
+      if (!t) return;
+      store.set(['tracks', t.id, 'ticks'], Math.min(MAX_TICKS, t.ticks + TICKS_PER_MARK[t.rank] * e.n));
+      say(`Progress${e.n > 1 ? ' ×' + e.n : ''} on ${t.name || t.type}`);
+      break;
+    }
+    case 'pos': store.set(['tracks', arg, 'position'], e.v); say(e.v === 'bad' ? 'In a bad spot' : 'In control'); break;
+    case 'clock': {
+      const c = S().clocks[arg];
+      if (!c) return;
+      store.set(['clocks', c.id, 'filled'], Math.min(c.segments, c.filled + e.n));
+      say(`${c.name || 'Clock'} ${Math.min(c.segments, c.filled + e.n)}/${c.segments}`);
+      break;
+    }
+    case 'nextAdd': ui.rollAdds = 1; say('+1 on the next roll'); break;
+    case 'oracle': doOracle(e.id); break;
+    case 'ptp': doOracle('sf/moves/pay_the_price'); break;
+    case 'nemesis': {
+      const n = S().nemeses[arg];
+      if (!n) return;
+      store.set(['nemeses', n.id, 'filled'], Math.min(n.segments, n.filled + 1));
+      say(`${n.name || 'A Nemesis'}'s scheme advances (${Math.min(n.segments, n.filled + 1)}/${n.segments})`);
+      break;
+    }
+    case 'escape': r.applied[key] = true; actions.escapeCheck(); return;
+    case 'plot': doOracle('ss/plot'); if (hero) store.set(['heroes', hero.id, 'legacies', 'heroics'], Math.min(40, hero.legacies.heroics + 2)); say('Uncover a Plot: Heroics +2 ticks'); break;
+    case 'legacy': {
+      const rank = track && rankShift(track.rank, e.d);
+      const ticks = rank ? LEGACY_TICKS[rank] : 0;
+      if (hero && ticks) store.set(['heroes', hero.id, 'legacies', e.l], Math.min(40, hero.legacies[e.l] + ticks));
+      say(`${hero ? hero.name + ': ' : ''}${e.l} +${ticks} ticks`);
+      break;
+    }
+    case 'heroicsScene': {
+      const ticks = track ? (track.rank === 'dangerous' ? 1 : 2) : 0;
+      if (hero) store.set(['heroes', hero.id, 'legacies', 'heroics'], Math.min(40, hero.legacies.heroics + ticks));
+      say(`Heroics +${ticks} ticks`);
+      break;
+    }
+    case 'milestone': {
+      const v = S().tracks[arg];
+      if (!v) return;
+      store.set(['tracks', v.id, 'ticks'], Math.min(MAX_TICKS, v.ticks + TICKS_PER_MARK[v.rank]));
+      say(`Milestone on ${v.name || 'vow'}`);
+      break;
+    }
+    case 'done': if (track) { store.set(['tracks', track.id, 'done'], true); say(`${track.name || track.type} done`); } break;
+    case 'setback': if (track) {
+      const n = Math.min(r.c1, r.c2);
+      store.set(['tracks', track.id, 'ticks'], Math.max(0, track.ticks - n * 4));
+      store.set(['tracks', track.id, 'rank'], RANKS[Math.min(RANKS.length - 1, RANKS.indexOf(track.rank) + 1)]);
+      say(`${track.name || track.type}: cleared ${n} boxes and raised the rank`);
+    } break;
+    case 'abandon': doOracle('sf/moves/pay_the_price'); say(bumpMeter(hero, 'heat', 1)); if (track) store.set(['tracks', track.id, 'done'], true); say('Patrol abandoned'); break;
+    case 'wrongPerson': doOracle('sf/moves/pay_the_price'); say(bumpMeter(hero, 'heat', 2)); say('Accused the wrong person'); break;
+    case 'forsake': if (track) store.set(['tracks', track.id, 'done'], true); say('Vow forsaken. Endure Stress.'); break;
+    case 'newTrack': {
+      const t = { id: uid(), created: Date.now(), name: '', type: arg, rank: 'dangerous', ticks: 0, done: false };
+      store.set(['tracks', t.id], t);
+      break;
+    }
+    default: return;
+  }
+  r.applied[key] = true;
+  if (said.length) log(said.join('. ') + '.', 'roll');
+  render();
+}
+
+// ---------- character creation ----------
+const ARCHETYPES = [
+  { id: 'brawler', name: 'Masked brawler', blurb: 'Fists, grit and a neighborhood to protect.', stats: { iron: 3, edge: 2, heart: 2, shadow: 1, wits: 1 }, power: 'ss/power_super_strength', source: 'Training', path: 'ss/vigilante', extra: 'ss/kit', vow: 'Drive the gang that killed my brother out of the neighborhood' },
+  { id: 'excop', name: 'Ex-cop gone rogue', blurb: 'Knows how the department works, and who owns it.', stats: { wits: 3, iron: 2, heart: 2, edge: 1, shadow: 1 }, power: 'ss/power_danger_sense', source: 'Training', path: 'ss/investigator', extra: 'ss/special_vehicle', vow: 'Prove who in the department set me up' },
+  { id: 'hacker', name: 'Hacker in a van', blurb: 'Cameras, phones and locks all answer to you.', stats: { wits: 3, shadow: 2, edge: 2, heart: 1, iron: 1 }, power: 'ss/power_gadgeteer', source: 'Technology', path: 'ss/genius', extra: 'ss/kit', vow: 'Expose the company that ruined my family' },
+  { id: 'thief', name: 'Reformed thief', blurb: 'Rooftops, locks and old debts.', stats: { shadow: 3, edge: 2, wits: 2, heart: 1, iron: 1 }, power: 'ss/power_danger_sense', source: 'Training', path: 'ss/secret_identity', extra: 'ss/kit', vow: 'Pay back everyone I stole from' },
+  { id: 'medic', name: 'Night-shift medic', blurb: 'Patches people up, then goes looking for whoever hurt them.', stats: { heart: 3, iron: 2, wits: 2, edge: 1, shadow: 1 }, power: 'ss/power_healing_factor', source: 'Mutation', path: 'ss/code_of_honor', extra: 'ss/kit', vow: "Find out what's making people sick in the projects" },
+  { id: 'reporter', name: 'Reporter with a mask', blurb: 'The story by day, the truth by night.', stats: { heart: 3, wits: 2, shadow: 2, edge: 1, iron: 1 }, power: 'ss/power_enhanced_senses', source: 'Training', path: 'ss/journalist', extra: 'ss/investigator', vow: 'Bring down the man who owns city hall' },
+  { id: 'occult', name: 'Occult detective', blurb: 'One strange gift, and it cost too much.', stats: { wits: 3, heart: 2, shadow: 2, edge: 1, iron: 1 }, power: 'ss/power_custom', source: 'Supernatural', path: 'ss/investigator', extra: 'ss/secret_identity', vow: 'Find out what I bargained away' },
+];
+const STAT_ARRAY = [3, 2, 2, 1, 1];
+
+function newWizard() {
+  return { archetype: '', name: '', identity: '', stats: { edge: 0, heart: 0, iron: 0, shadow: 0, wits: 0 }, power: '', source: 'Training', path: '', extra: '', bgVow: '', nowVow: '', nowRank: 'dangerous', hqType: '' };
+}
+function applyArchetype(id) {
+  const a = ARCHETYPES.find(x => x.id === id);
+  if (!a) return;
+  Object.assign(ui.cw, { archetype: a.id, stats: { ...a.stats }, power: a.power, source: a.source, path: a.path, extra: a.extra, bgVow: ui.cw.bgVow || a.vow });
+}
+function cwReady(w) { return !!(w.name.trim() && statsValid(w.stats) && w.power && w.path && w.bgVow.trim()); }
+function cwRefresh() {
+  const btn = document.querySelector('[data-act="cwCreate"]');
+  if (!btn || !ui.cw) return;
+  const ready = cwReady(ui.cw);
+  btn.disabled = !ready;
+  const hint = btn.nextElementSibling;
+  if (hint && hint.classList.contains('hint') && hint.dataset.cwhint) hint.hidden = ready;
+}
+function statsValid(st) {
+  return Object.values(st).sort((x, y) => y - x).join() === STAT_ARRAY.join();
+}
+
+function viewCreate() {
+  const w = ui.cw || (ui.cw = newWizard());
+  const assetsOf = cats => D.assets.filter(a => cats.includes(a.cat));
+  const opt = (list, cur, blank = '(choose)') => `<option value="">${blank}</option>` + list.map(a => `<option value="${esc(a.id)}" ${a.id === cur ? 'selected' : ''}>${esc(a.name)}</option>`).join('');
+  const valid = statsValid(w.stats);
+  const strange = w.source && !['Training', 'Technology'].includes(w.source);
+  const ready = cwReady(w);
+  return `<div class="modal-head"><h3>New hero</h3><button class="btn sm" data-act="closeModal">Cancel</button></div>
+  <section class="card">
+    <h4>1. Pick an archetype <small>or skip and build your own</small></h4>
+    <div class="arch">${ARCHETYPES.map(a => `<button class="archbtn ${w.archetype === a.id ? 'on' : ''}" data-act="cwArchetype" data-id="${a.id}"><b>${esc(a.name)}</b><span>${esc(a.blurb)}</span></button>`).join('')}</div>
+  </section>
+  <section class="card">
+    <h4>2. Who are they?</h4>
+    <label class="field">Hero name <input data-cw="name" value="${esc(w.name)}" placeholder="What the papers call you"></label>
+    <label class="field">By day <input data-cw="identity" value="${esc(w.identity)}" placeholder="Name and how you pay rent"></label>
+  </section>
+  <section class="card">
+    <h4>3. Stats <small>${valid ? 'looks good' : 'use 3, 2, 2, 1, 1'}</small></h4>
+    <div class="cwstats">${D.rules.stats.map(s => `<label>${cap(s)} <select data-cw="stat.${s}">${[0, 1, 2, 3].map(v => `<option value="${v}" ${w.stats[s] === v ? 'selected' : ''}>${v}</option>`).join('')}</select></label>`).join('')}</div>
+    ${valid ? '' : '<p class="err">Each stat gets one number from 3, 2, 2, 1, 1.</p>'}
+  </section>
+  <section class="card">
+    <h4>4. Assets <small>HQ is added for you</small></h4>
+    <label class="field">Power <select data-cw="power">${opt(assetsOf(['Power']), w.power)}</select></label>
+    <label class="field">Source <select data-cw="source">${D.sources.map(s => `<option ${s.name === w.source ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}</select></label>
+    ${strange ? `<p class="hint">${esc(w.source)} powers are limited to one card and come with a cost. Note the cost on the power after creating.</p>` : ''}
+    <label class="field">Path <select data-cw="path">${opt(assetsOf(['Path']), w.path)}</select></label>
+    <label class="field">One more <select data-cw="extra">${opt(assetsOf(['Module', 'Companion', 'Path', 'Power', 'Deed']), w.extra, '(none for now)')}</select></label>
+    <label class="field">Hideout <input data-cw="hqType" value="${esc(w.hqType)}" placeholder="Back room of a diner, a friend's garage…"></label>
+  </section>
+  <section class="card">
+    <h4>5. Vows</h4>
+    <label class="field">Background vow (Epic) <input data-cw="bgVow" value="${esc(w.bgVow)}" placeholder="The thing you'll spend the whole campaign on"></label>
+    <label class="field">What you're doing right now <input data-cw="nowVow" value="${esc(w.nowVow)}" placeholder="Optional: a smaller vow tied to the city"></label>
+    <label class="field">Its rank <select data-cw="nowRank">${['troublesome', 'dangerous'].map(x => `<option ${x === w.nowRank ? 'selected' : ''}>${x}</option>`).join('')}</select></label>
+  </section>
+  <section class="card">
+    <button class="btn big accent" data-act="cwCreate" ${ready ? '' : 'disabled'}>Create hero</button>
+<p class="hint" data-cwhint="1" ${ready ? 'hidden' : ''}>Needs a name, valid stats, a power, a path and a background vow.</p>
+    <p class="hint">After this, generate a Nemesis together on the Tracks tab. It's a villain who already knows one of you, with their scheme clock at 2.</p>
+    <button class="btn sm" data-act="cwBlank">Skip and make a blank hero instead</button>
+  </section>`;
+}
+
+function createFromWizard() {
+  const w = ui.cw;
+  if (!w || !statsValid(w.stats)) return;
+  const h = blankHero(w.name.trim());
+  h.identity = w.identity.trim();
+  h.stats = { ...w.stats };
+  const add = (ref, fields = {}) => {
+    const a = D.assetById[ref];
+    if (!a) return;
+    const inst = { id: uid(), created: Date.now() + Object.keys(h.assets).length, ref, enabled: { a0: true }, fields, meters: {} };
+    for (const [k, m] of Object.entries(a.meters || {})) inst.meters[k] = k === 'health' || k === 'integrity' ? m.max : 0;
+    h.assets[inst.id] = inst;
+  };
+  add('ss/hq', w.hqType ? { type: w.hqType.trim() } : {});
+  add(w.power, { source: w.source });
+  add(w.path);
+  if (w.extra) add(w.extra);
+  if (Object.values(h.assets).some(x => x.ref === 'ss/power_toughness')) h.health = 6;
+  store.set(['heroes', h.id], h);
+  const vow = (name, rank) => { const t = { id: uid(), created: Date.now(), name, type: 'vow', rank, ticks: 0, done: false }; store.set(['tracks', t.id], t); };
+  vow(`${h.name}: ${w.bgVow.trim()}`, 'epic');
+  if (w.nowVow.trim()) vow(`${h.name}: ${w.nowVow.trim()}`, w.nowRank);
+  log(`**${h.name} joins the fight.** ${h.identity ? h.identity + '. ' : ''}Background vow: ${w.bgVow.trim()}.`, 'note');
+  ui.heroId = h.id; ui.rollHero = h.id; ui.cw = null; ui.modal = null; ui.tab = 'heroes'; saveUi();
+  render(); $view().scrollTop = 0;
+}
+
+// ---------- sessions ----------
+function lastRecap() { return sorted(S().journal).filter(e => e.kind === 'recap').pop(); }
+
+function viewBegin() {
+  const d = ui.beginDone || {};
+  const recap = lastRecap();
+  return `<div class="modal-head"><h3>Begin session ${S().shared.session + 1}</h3><button class="btn sm" data-act="closeModal">${d.started ? 'Done' : 'Cancel'}</button></div>
+  ${recap ? `<section class="card recap"><h4>Previously…</h4>${md(recap.text.replace(/^\*\*Recap of session \d+\.\*\*\s*/, ''))}</section>` : ''}
+  <section class="card">
+    <ol class="steps">
+      <li><b>Check in on content.</b><p>Anything either of you wants kept off the table, or handled off screen? Set a flag.</p></li>
+      <li><b>Recap.</b><p>${recap ? 'Read the recap above out loud.' : 'Talk through what happened last time.'}</p></li>
+      <li><b>Set the scene.</b><p>Where is each hero right now, and what do they want tonight?</p></li>
+      <li><b>Optional: spotlight a danger.</b><p>A short scene the heroes can't see. If you play one, everyone takes +1 momentum.</p>
+        <div class="row wrap">${fxBtn('beginSpotlight', 'Roll a spotlight', d.spot)}${fxBtn('allMomentum', 'Everyone +1 momentum', d.mom, 'begin')}</div></li>
+    </ol>
+    <button class="btn big accent" data-act="beginSession" ${d.started ? 'disabled' : ''}>${d.started ? `Session ${S().shared.session} started` : 'Start the session'}</button>
+  </section>`;
+}
+function fxBtn(act, label, done, which = '', id = '') {
+  return `<button class="btn sm" data-act="${act}" data-which="${esc(which)}" data-id="${esc(id)}" ${done ? 'disabled' : ''}>${esc(label)}</button>`;
+}
+
+function viewEnd() {
+  const d = ui.endDone || {};
+  const ai = aiReady();
+  const large = sorted(S().nemeses).filter(n => n.status === 'large');
+  return `<div class="modal-head"><h3>End session ${S().shared.session}</h3><button class="btn sm" data-act="closeModal">Done</button></div>
+  <section class="card">
+    <ol class="steps">
+      <li><b>Missed progress?</b><p>Did you move forward on a vow? Reach a Milestone. Grow closer to a Connection? Develop Your Relationship. Mark it on the Tracks tab.</p></li>
+      <li><b>Nemeses who went unopposed</b><p>Advance the scheme of any Nemesis the heroes didn't touch this session.</p>
+        <div class="row wrap">${large.length ? large.map(n => fxBtn('endAdvance', `Advance ${n.name || 'Nemesis'} (${n.filled}/${n.segments})`, d['n' + n.id], '', n.id)).join('') : '<span class="muted">No Nemesis at large.</span>'}</div></li>
+      <li><b>Pick a focus for next time</b><p>Note a vow, Connection or thread to focus on next session, and take +1 momentum.</p>
+        <div class="row wrap">${fxBtn('allMomentum', 'Everyone +1 momentum', d.mom, 'end')}</div></li>
+      <li><b>Recap</b><p>${ai ? 'Let the AI draft a "previously on" from tonight\'s journal, then edit it.' : 'Write a few lines about tonight. It shows up at the start of next session.'}</p>
+        ${ai ? `<button class="btn sm" data-act="genRecap">Draft recap from the journal</button>` : ''}
+        <textarea id="recaptext" rows="6" placeholder="Tonight, Night Owl…">${esc(ui.recapDraft || '')}</textarea>
+        <button class="btn accent" data-act="saveRecap" ${d.recap ? 'disabled' : ''}>${d.recap ? 'Recap saved' : 'Save recap'}</button></li>
+    </ol>
+  </section>`;
+}
+
+// ---------- campaign chooser ----------
+function viewCampaigns() {
+  const camps = store.campaigns();
+  const cur = S().meta.id;
+  const when = t => (t ? new Date(t).toLocaleDateString([], { month: 'short', day: 'numeric' }) : '');
+  return `<div class="modal-head"><h3>Campaigns</h3><button class="btn sm" data-act="closeModal">Close</button></div>
+  ${camps.map(c => `<section class="card camp ${c.id === cur ? 'current' : ''}">
+    ${c.id === cur ? `<input class="title-in" data-rename="1" value="${esc(S().meta.name)}" aria-label="Campaign name">` : `<h3>${esc(c.name)}</h3>`}
+    <p class="muted small">${esc(gameName(c.game || 'supersworn'))}${c.city ? ' · ' + esc(c.city) : ''}${c.session ? ` · session ${esc(c.session)}` : ''} · ${esc(when(c.updated))}</p>
+    ${c.heroes && c.heroes.length ? `<p class="small">${c.heroes.map(esc).join(', ')}</p>` : ''}
+    <div class="row wrap">${c.id === cur ? '<span class="tag">Open now</span>' : `<button class="btn accent sm" data-act="switchCamp" data-id="${esc(c.id)}">Open</button><button class="btn sm danger" data-act="delCamp" data-id="${esc(c.id)}">Delete</button>`}</div>
+  </section>`).join('')}
+  <section class="card">
+    <h4>New campaign</h4>
+    <label class="field">Name <input id="newcampname" placeholder="Eastside Nights"></label>
+    <label class="field">Game <select id="newcampgame">${GAMES.map(g => `<option value="${g.id}">${esc(g.name)}</option>`).join('')}<option disabled>More games later</option></select></label>
+    <button class="btn" data-act="newCamp">Create campaign</button>
+  </section>`;
+}
+
 function showErr(msg) { const e = document.getElementById('syncerr'); if (e) e.textContent = msg; }
 
 function confirmTwice(el) {
@@ -775,6 +1215,7 @@ function wire() {
   document.addEventListener('click', e => {
     const tab = e.target.closest('nav button[data-tab]');
     if (tab) { ui.tab = tab.dataset.tab; ui.modal = null; saveUi(); render(); $view().scrollTop = 0; return; }
+    if (e.target.closest('#campname')) { ui.modal = ui.modal === 'campaigns' ? null : 'campaigns'; render(); $view().scrollTop = 0; return; }
     if (e.target.closest('#settingsbtn')) { ui.modal = ui.modal === 'settings' ? null : 'settings'; render(); $view().scrollTop = 0; return; }
     const el = e.target.closest('[data-act]');
     if (el && actions[el.dataset.act]) { e.preventDefault(); actions[el.dataset.act](el); }
@@ -798,6 +1239,14 @@ function wire() {
       return;
     }
     if (el.dataset.pref) { store.setPref(el.dataset.pref, el.value.trim()); return; }
+    if (el.dataset.cw) {
+      const k = el.dataset.cw;
+      if (k.startsWith('stat.')) ui.cw.stats[k.slice(5)] = +el.value; else ui.cw[k] = el.value;
+      if (el.tagName === 'SELECT') render();
+      return;
+    }
+    if (el.id === 'recaptext') { ui.recapDraft = el.value; return; }
+    if (el.dataset.rename) { store.set(['meta', 'name'], el.value.trim() || 'Campaign'); return; }
     if (el.dataset.ui) {
       ui[el.dataset.ui] = el.value;
       if (el.dataset.ui === 'rollHero') { ui.heroId = el.value; }
@@ -828,7 +1277,13 @@ function wire() {
       if (again) { again.focus(); again.setSelectionRange(pos, pos); }
     }
   });
-  document.addEventListener('input', e => { if (e.target.dataset && e.target.dataset.draft) ui.drafts[e.target.id] = e.target.value; });
+  document.addEventListener('input', e => {
+    const t = e.target;
+    if (!t.dataset) return;
+    if (t.dataset.draft) ui.drafts[t.id] = t.value;
+    if (t.dataset.cw && t.tagName === 'INPUT' && ui.cw) { ui.cw[t.dataset.cw] = t.value; cwRefresh(); }
+    if (t.id === 'recaptext') ui.recapDraft = t.value;
+  });
   document.addEventListener('focusout', () => setTimeout(() => { if (ui.pendingRender) requestRender(); }, 0));
   // Hold re-renders while a finger is down so the button being tapped still exists when its click fires.
   let releaseTimer = null;

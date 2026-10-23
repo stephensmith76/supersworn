@@ -11,3 +11,8 @@ Uses a Firebase Realtime Database through its REST API. One player hosts and sha
 ## Credits
 Rules text from Ironsworn: Starforged by Shawn Tomkin, licensed CC BY 4.0, via the Datasworn project.
 Supersworn hack by its original author, revised for street-level play.
+
+## Adding another game later
+Every campaign is tagged with `meta.game` (currently always `supersworn`), and the campaign chooser lists the games in `GAMES` in `js/app.js`.
+To add a system: give it its own data files (moves, assets, oracles, rules notes), register it in `GAMES`, and have `loadData()` pick the data set from the open campaign's game.
+Sheets, tracks, clocks, the journal, sync and the AI chat are shared by every game.

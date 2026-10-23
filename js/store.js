@@ -85,15 +85,22 @@ const cleanNemesis = entity((n, k) => ({
 }));
 
 const cleanEntry = entity((e, k) => ({
-  id: k, created: created(e), author: str(e.author, 60), kind: oneOf(e.kind, ['note', 'roll', 'oracle'], 'note'), text: str(e.text, 8000),
+  id: k, created: created(e), author: str(e.author, 60), kind: oneOf(e.kind, ['note', 'roll', 'oracle', 'session', 'recap'], 'note'), text: str(e.text, 8000),
 }));
 
 export function sanitize(s) {
   const src = isObj(s) ? s : {};
   const m = isObj(src.meta) ? src.meta : {};
   return {
-    meta: { id: ID.test(m.id) ? m.id : uid(), name: str(m.name, 80) || 'Campaign', created: num(m.created, Date.now(), 1, 1e15), city: str(m.city, 80) },
-    shared: { resources: num((src.shared || {}).resources, 5, 0, 5) },
+    meta: {
+      id: ID.test(m.id) ? m.id : uid(), name: str(m.name, 80) || 'Campaign', created: num(m.created, Date.now(), 1, 1e15), city: str(m.city, 80),
+      game: /^[a-z0-9-]{1,30}$/.test(m.game) ? m.game : 'supersworn',
+    },
+    shared: {
+      resources: num((src.shared || {}).resources, 5, 0, 5),
+      session: num((src.shared || {}).session, 0, 0, 9999),
+      sessionStart: num((src.shared || {}).sessionStart, 0, 0, 1e15),
+    },
     heroes: map(src.heroes, cleanHero),
     tracks: map(src.tracks, cleanTrack),
     clocks: map(src.clocks, cleanClock),
@@ -104,10 +111,10 @@ export function sanitize(s) {
 
 export const safePath = path => Array.isArray(path) && path.length > 0 && path.every(p => typeof p === 'string' && p && !BAD_KEYS.has(p));
 
-export function blankCampaign(name = 'New campaign') {
+export function blankCampaign(name = 'New campaign', game = 'supersworn') {
   return {
-    meta: { id: uid(), name, created: Date.now(), city: '' },
-    shared: { resources: 5 },
+    meta: { id: uid(), name, created: Date.now(), city: '', game },
+    shared: { resources: 5, session: 0, sessionStart: 0 },
     heroes: {}, tracks: {}, clocks: {}, nemeses: {}, journal: {},
   };
 }
@@ -152,7 +159,7 @@ export const store = {
     lsSet(LS_ACTIVE, state.meta.id);
     emit('*');
   },
-  newCampaign(name) { this.replace(blankCampaign(name)); },
+  newCampaign(name, game) { this.replace(blankCampaign(name, game)); },
   deleteCampaign(id) {
     lsSet(LS_INDEX, this.campaigns().filter(c => c.id !== id));
     try { localStorage.removeItem('ss.c.' + id); } catch { /* ignore */ }
@@ -160,7 +167,10 @@ export const store = {
   persist() {
     lsSet('ss.c.' + state.meta.id, state);
     const idx = this.campaigns().filter(c => c.id !== state.meta.id);
-    idx.unshift({ id: state.meta.id, name: state.meta.name, updated: Date.now() });
+    idx.unshift({
+      id: state.meta.id, name: state.meta.name, city: state.meta.city, game: state.meta.game, updated: Date.now(),
+      heroes: Object.values(state.heroes).map(h => h.name).filter(Boolean).slice(0, 4), session: state.shared.session,
+    });
     lsSet(LS_INDEX, idx);
   },
   setPref(k, v) { prefs = { ...prefs, [k]: v }; lsSet(LS_PREFS, prefs); emit('prefs'); },
