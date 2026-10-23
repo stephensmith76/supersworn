@@ -6,8 +6,10 @@ export const AI_PROVIDERS = {
   claude: { label: 'Anthropic Claude', model: 'claude-haiku-5-5' },
 };
 
-const SYSTEM = `You are the rules reference for a two-player game of Supersworn: Street Level, a hack of Ironsworn: Starforged about masked heroes in a corrupt city.
-Answer rules questions from the rules text provided. When the hack changes a Starforged rule, the hack wins.
+const SYSTEM = `You are the rules reference and app helper for a two-player game of Supersworn: Street Level, a hack of Ironsworn: Starforged about masked heroes in a corrupt city.
+The players use a phone app to track their game. You can answer two kinds of questions:
+1. Rules questions. Answer from the rules text provided. When the hack changes a Starforged rule, the hack wins.
+2. How to use the app. Answer from the app manual provided, using the exact tab and button names. When a rules answer involves the app (marking progress, rolling, adding Heat), say where to tap.
 Name the moves and assets you rely on. Use the current game state when it matters (stats, momentum, Heat, enabled abilities, track progress).
 Keep answers short: a direct answer first, then the reasoning in a sentence or two. Use plain language and no em dashes.
 If the rules don't cover something, say so plainly and suggest Ask the Oracle or a quick table ruling. Don't invent rules.
@@ -25,7 +27,16 @@ export async function askRules(messages, ctx) {
   const key = store.prefs.aiKey;
   const model = store.prefs.aiModel || AI_PROVIDERS[provider].model;
   if (!key) throw new Error('Add an API key in settings first.');
-  const history = messages.slice(-10);
+  // Keep the last few exchanges. Providers require the history to start with a
+  // user turn and alternate roles, so trim and merge until it does.
+  let history = messages.slice(-10);
+  while (history.length && history[0].role !== 'user') history.shift();
+  history = history.reduce((acc, m) => {
+    const last = acc[acc.length - 1];
+    if (last && last.role === m.role) last.text += '\n\n' + m.text;
+    else acc.push({ role: m.role, text: m.text });
+    return acc;
+  }, []);
   let res;
   try {
     if (provider === 'claude') {

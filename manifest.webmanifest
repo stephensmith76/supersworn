@@ -2,10 +2,10 @@
   "name": "Supersworn: Street Level",
   "short_name": "Supersworn",
   "description": "Toolkit for Supersworn, a street-level Starforged hack",
+  "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#111214",
   "theme_color": "#111214",
   "icons": [

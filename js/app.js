@@ -1,7 +1,7 @@
 import { store, uid, blankHero, sorted } from './store.js';
 import { sync } from './sync.js';
 import {
-  rnd, RANKS, TICKS_PER_MARK, LEGACY_REWARD, MAX_TICKS, boxes, momentumLimits, HEAT_EFFECTS,
+  rnd, RANKS, TICKS_PER_MARK, MAX_TICKS, boxes, momentumLimits, HEAT_EFFECTS,
   actionRoll, progressRoll, RESULT_LABEL, ODDS, askOracle, rollOracle,
 } from './rules.js';
 import { AI_PROVIDERS, askRules } from './ai.js';
@@ -16,6 +16,7 @@ async function loadData() {
     fetch('data/villains.json').then(r => r.json()),
     fetch('data/rules-notes.md').then(r => r.text()),
   ]);
+  D.appGuide = await fetch('data/app-guide.md').then(r => r.text());
   D.guides = (await fetch('data/guides.json').then(r => r.json())).guides;
   D.villain = vil;
   D.notes = notes;
@@ -36,9 +37,9 @@ async function loadData() {
 // ---------- ui state (per device, not synced) ----------
 const ui = {
   tab: 'heroes', heroId: null, modal: null, lastRoll: null, oracleResults: [], moveId: '', rollStat: 'iron',
-  rollAdds: 0, rollHero: null, moveQuery: '', oracleQuery: '', assetQuery: '', pendingRender: false,
+  rollAdds: 0, rollHero: null, moveQuery: '', oracleQuery: '', assetQuery: '', pendingRender: false, drafts: {},
 };
-try { Object.assign(ui, JSON.parse(localStorage.getItem('ss.ui') || '{}'), { modal: null, lastRoll: null, pendingRender: false }); } catch { /* ignore */ }
+try { Object.assign(ui, JSON.parse(localStorage.getItem('ss.ui') || '{}'), { modal: null, lastRoll: null, pendingRender: false, drafts: {} }); } catch { /* ignore */ }
 function saveUi() {
   try { localStorage.setItem('ss.ui', JSON.stringify({ tab: ui.tab, heroId: ui.heroId, rollStat: ui.rollStat, rollHero: ui.rollHero })); } catch { /* ignore */ }
 }
@@ -63,7 +64,7 @@ function stepper(path, value, { min = 0, max = 5, label = '' } = {}) {
   return `<div class="stepper" data-path="${esc(JSON.stringify(path))}" data-min="${min}" data-max="${max}">
     ${label ? `<span class="lbl">${esc(label)}</span>` : ''}
     <button class="step" data-act="dec" aria-label="Decrease ${esc(label)}">−</button>
-    <span class="val">${value > 0 && min < 0 ? '+' : ''}${value}</span>
+    <span class="val">${value > 0 && min < 0 ? '+' : ''}${esc(value)}</span>
     <button class="step" data-act="inc" aria-label="Increase ${esc(label)}">+</button>
   </div>`;
 }
@@ -158,7 +159,7 @@ function assetCard(h, inst) {
   const a = D.assetById[inst.ref];
   if (!a) return '';
   const base = ['heroes', h.id, 'assets', inst.id];
-  return `<details class="asset">
+  return `<details class="asset" data-key="asset-${esc(inst.id)}">
     <summary><span class="cat">${esc(a.cat)}</span> ${esc(a.name)}${inst.fields && Object.values(inst.fields).find(Boolean) ? ` <small>${esc(Object.values(inst.fields).filter(Boolean).join(', '))}</small>` : ''}</summary>
     ${a.requirement ? `<p class="req">${esc(a.requirement)}</p>` : ''}
     ${a.note ? `<p class="req">${esc(a.note)}</p>` : ''}
@@ -180,7 +181,7 @@ function viewAssetPicker() {
   return `<div class="modal-head"><h3>Add asset</h3><button class="btn sm" data-act="closeModal">Close</button></div>
     <input class="search" data-ui="assetQuery" value="${esc(ui.assetQuery)}" placeholder="Search assets">
     <p class="hint">Sources: ${D.sources.map(s => `<b>${esc(s.name)}</b>`).join(', ')}. Anything but Training or Technology allows one power, with a cost.</p>
-    ${order.filter(c => groups[c]).map(c => `<h4>${c}</h4>${groups[c].map(a => `<details class="asset pick"><summary>${esc(a.name)} ${a.id.startsWith('ss/') ? '<span class="tag">Supersworn</span>' : ''}</summary>
+    ${order.filter(c => groups[c]).map(c => `<h4>${c}</h4>${groups[c].map(a => `<details class="asset pick" data-key="pick-${esc(a.id)}"><summary>${esc(a.name)} ${a.id.startsWith('ss/') ? '<span class="tag">Supersworn</span>' : ''}</summary>
       ${a.requirement ? `<p class="req">${esc(a.requirement)}</p>` : ''}<ol class="abilities">${a.abilities.map(t => `<li>${md(t)}</li>`).join('')}</ol>
       <button class="btn" data-act="addAsset" data-ref="${a.id}">Add ${esc(a.name)}</button></details>`).join('')}`).join('')}`;
 }
@@ -232,7 +233,7 @@ function viewTracks() {
           <select data-bind='${esc(JSON.stringify(p.concat('status')))}'><option value="large" ${n.status === 'large' ? 'selected' : ''}>At large</option><option value="locked" ${n.status === 'locked' ? 'selected' : ''}>Locked up</option><option value="retired" ${n.status === 'retired' ? 'selected' : ''}>Retired</option></select>
         </div>
         ${clockBlock(p, n, 'Scheme', true)}
-        <details class="sheet"><summary>Villain sheet</summary>${input(p.concat('sheet'), n.sheet || '', { area: true, placeholder: 'Motive, edge, method, weakness, lair, muscle, look, calling card' })}</details>
+        <details class="sheet" data-key="sheet-${esc(n.id)}"><summary>Villain sheet</summary>${input(p.concat('sheet'), n.sheet || '', { area: true, placeholder: 'Motive, edge, method, weakness, lair, muscle, look, calling card' })}</details>
         <div class="row wrap">
           ${n.status === 'large' ? `<button class="btn sm" data-act="lockUp" data-id="${n.id}">Lock up</button>` : ''}
           <button class="btn sm danger" data-act="del" data-path='${esc(JSON.stringify(p))}'>Delete</button>
@@ -287,13 +288,13 @@ function rollCard(r) {
   return `<div class="roll ${res} ${r.match ? 'match' : ''}" role="status">
     <div class="outcome">${RESULT_LABEL[res]}${r.match ? ' <span class="m">match</span>' : ''}</div>
     ${r.kind === 'action'
-      ? `<div class="dice"><span class="d6">${r.cancelled ? '<s>' + r.a + '</s>' : r.a}</span> + ${r.stat} ${r.adds ? `+ ${r.adds}` : ''} = <b>${r.burned ? r.burn.score + ' (momentum)' : r.score}</b>
+      ? `<div class="dice"><span class="d6">${r.cancelled ? '<s>' + r.a + '</s>' : r.a}</span> ${r.stat < 0 ? '− ' + (-r.stat) : '+ ' + r.stat} ${r.adds ? (r.adds < 0 ? `− ${-r.adds}` : `+ ${r.adds}`) : ''} = <b>${r.burned ? r.burn.score + ' (momentum)' : r.score}</b>
          <span class="vs">vs</span> <span class="d10">${r.c1}</span><span class="d10">${r.c2}</span></div>`
       : `<div class="dice">Progress <b>${r.score}</b> <span class="vs">vs</span> <span class="d10">${r.c1}</span><span class="d10">${r.c2}</span></div>`}
     ${r.cancelled ? '<p class="small">Negative momentum cancelled the action die.</p>' : ''}
     ${r.label ? `<p class="small">${esc(r.label)}</p>` : ''}
     ${r.burn && !r.burned ? `<button class="btn accent" data-act="burn">Burn momentum: ${RESULT_LABEL[r.burn.result]}</button>` : ''}
-    ${r.match && r.kind === 'action' ? '<p class="small">A match: check scheme clocks, and Nemesis escapes if you were patrolling.</p>' : ''}
+    ${r.match ? `<p class="small">${r.kind === 'action' ? 'A match: check scheme clocks, and Nemesis escapes if you were patrolling.' : 'A match: something unexpected happens, for good or ill.'}</p>` : ''}
   </div>`;
 }
 
@@ -301,6 +302,7 @@ function viewRoll() {
   const hs = heroes();
   const h = S().heroes[ui.rollHero] || currentHero();
   const opts = rollStatOptions(h);
+  if (!opts.some(o => o[0] === ui.rollStat)) ui.rollStat = (D.moveById[ui.moveId] || {}).stats?.[0] || 'edge';
   const move = D.moveById[ui.moveId];
   const groups = {};
   const q = ui.moveQuery.toLowerCase();
@@ -321,7 +323,7 @@ function viewRoll() {
     <button class="btn big accent" data-act="actionRoll" ${h ? '' : 'disabled'}>Roll</button>
     ${h ? '' : '<p class="empty">Add a hero first.</p>'}
     ${ui.lastRoll && ui.lastRoll.kind === 'action' ? rollCard(ui.lastRoll) : ''}
-    ${move ? `<details class="movetext" open><summary>${esc(move.name)}</summary>${md(move.text)}${(move.oracles || []).map(o => `<button class="btn sm" data-act="rollOracle" data-id="${o}">Roll ${esc(D.oracleById[o].name)}</button>`).join(' ')}</details>` : ''}
+    ${move ? `<details class="movetext" data-key="cur-move" open><summary>${esc(move.name)}</summary>${md(move.text)}${(move.oracles || []).map(o => `<button class="btn sm" data-act="rollOracle" data-id="${o}">Roll ${esc(D.oracleById[o].name)}</button>`).join(' ')}</details>` : ''}
   </section>
   <section class="card">
     <h3>Progress roll</h3>
@@ -337,7 +339,7 @@ function viewRoll() {
   <section class="card">
     <h3>Moves</h3>
     <input class="search" data-ui="moveQuery" value="${esc(ui.moveQuery)}" placeholder="Search moves">
-    ${Object.entries(groups).map(([g, ms]) => `<h4>${esc(g)}</h4>${ms.map(m => `<details class="movetext"><summary>${esc(m.name)}</summary>${md(m.text)}
+    ${Object.entries(groups).map(([g, ms]) => `<h4>${esc(g)}</h4>${ms.map(m => `<details class="movetext" data-key="m-${esc(m.id)}"><summary>${esc(m.name)}</summary>${md(m.text)}
       <div class="row wrap">${m.roll === 'action_roll' ? `<button class="btn sm accent" data-act="useMove" data-id="${m.id}">Roll this</button>` : ''}
       ${(m.oracles || []).map(o => `<button class="btn sm" data-act="rollOracle" data-id="${o}">Roll ${esc(D.oracleById[o].name)}</button>`).join('')}</div></details>`).join('')}`).join('')}
   </section>`;
@@ -380,20 +382,20 @@ function viewAsk() {
   const guides = `<section class="card">
     <h3>Guides</h3>
     <p class="hint">Example sequences of moves for common situations. Tap a move to open it on the Roll tab.</p>
-    ${D.guides.map(g => `<details class="guide"><summary>${esc(g.title)}</summary><p class="muted">${esc(g.summary)}</p>
+    ${D.guides.map(g => `<details class="guide" data-key="g-${esc(g.id)}"><summary>${esc(g.title)}</summary><p class="muted">${esc(g.summary)}</p>
       <ol class="steps">${g.steps.map(s => `<li><b>${esc(s.t)}</b>${md(s.x)}${s.m && D.moveById[s.m] ? `<button class="btn sm" data-act="guideMove" data-id="${s.m}">${esc(D.moveById[s.m].name)}</button>` : ''}</li>`).join('')}</ol>
       ${g.tip ? `<p class="tipline">${esc(g.tip)}</p>` : ''}</details>`).join('')}
   </section>`;
   return guides + `<section class="card">
-    <h3>Rules questions</h3>
-    <p class="hint">Answers use the Supersworn and Starforged rules plus your current heroes, tracks and Nemeses. ${ai ? `Using ${esc(ai.label)}.` : ''}</p>
+    <h3>Ask</h3>
+    <p class="hint">Ask about the rules or how to use this app. Answers use the Supersworn and Starforged rules, this app's manual, and your current heroes, tracks and Nemeses. ${ai ? `Using ${esc(ai.label)}.` : ''}</p>
     ${ai ? '' : `<p class="alert">Add an API key in settings (gear icon) to turn this on.</p>`}
   </section>
   <div class="chat">${msgs.map((m, i) => `<div class="msg ${m.role}">${m.role === 'user' ? esc(m.show || m.text) : md(m.text)}
-    ${m.role === 'assistant' && !m.error ? `<button class="btn sm" data-act="saveAnswer" data-i="${i}">Save to journal</button>` : ''}</div>`).join('')}
+    ${m.role === 'assistant' && !m.error ? `<button class="btn sm" data-act="saveAnswer" data-i="${i}" ${m.saved ? 'disabled' : ''}>${m.saved ? 'Saved' : 'Save to journal'}</button>` : ''}</div>`).join('')}
     ${ui.asking ? '<div class="msg assistant thinking">Checking the rules…</div>' : ''}</div>
   <section class="card ask">
-    <textarea id="askq" rows="2" placeholder="Can I burn momentum on a progress roll?" ${ai ? '' : 'disabled'}></textarea>
+    <textarea id="askq" data-draft="1" rows="2" placeholder="How do I start a fight? Or: can I burn momentum on a progress roll?" ${ai ? '' : 'disabled'}>${esc(ui.drafts.askq || '')}</textarea>
     <div class="row wrap"><button class="btn accent" data-act="askSend" ${ai && !ui.asking ? '' : 'disabled'}>Ask</button>
     <button class="btn" data-act="askSend" data-walk="1" ${ai && !ui.asking ? '' : 'disabled'}>Walk me through it</button>
     ${msgs.length ? '<button class="btn sm" data-act="askClear">Clear chat</button>' : ''}</div>
@@ -403,7 +405,7 @@ function viewAsk() {
 function viewJournal() {
   const entries = sorted(S().journal).reverse();
   return `<section class="card">
-    <textarea id="jtext" rows="3" placeholder="What happens next?"></textarea>
+    <textarea id="jtext" data-draft="1" rows="3" placeholder="What happens next?">${esc(ui.drafts.jtext || '')}</textarea>
     <button class="btn accent" data-act="addEntry">Add to journal</button>
   </section>
   ${entries.map(e => `<article class="entry k-${e.kind}"><header><b>${esc(e.author)}</b> <time>${new Date(e.created).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</time>
@@ -424,7 +426,10 @@ function viewSettings() {
     <p class="hint">One of you hosts and reads the code to the other over Discord or the phone. You need a Firebase database URL first (setup steps are below).</p>
     <label class="field">Firebase database URL <input data-pref="dbUrl" value="${esc(store.prefs.dbUrl)}" placeholder="https://your-project-default-rtdb.firebaseio.com"></label>
     ${sync.code
-      ? `<p class="code">Session code <b>${esc(sync.code)}</b> <span class="dot ${st}"></span> ${esc(st)}</p><button class="btn" data-act="leave">Stop syncing</button>`
+      ? `<p class="code">Session code <b>${esc(sync.code)}</b> <span class="dot ${esc(st)}"></span> ${esc(st)}</p>
+         ${sync.detail ? `<p class="${st === 'error' ? 'err' : 'hint'}">${esc(sync.detail)}</p>` : ''}
+         ${sync.pending ? `<p class="hint">${sync.pending} change${sync.pending === 1 ? '' : 's'} waiting to send.</p>` : ''}
+         <button class="btn" data-act="leave">Stop syncing</button>`
       : `<div class="row wrap"><button class="btn accent" data-act="host">Host this campaign</button>
          <input id="joincode" placeholder="CODE" maxlength="6" class="codein"><button class="btn" data-act="join">Join</button></div>`}
     <p class="err" id="syncerr"></p>
@@ -467,19 +472,28 @@ function render() {
   const v = $view();
   if (!v) return;
   const scroll = v.scrollTop;
-  const open = [...v.querySelectorAll('details[open] > summary')].map(s => s.textContent);
-  v.innerHTML = MODALS[ui.modal] ? MODALS[ui.modal]() : (VIEWS[ui.tab] || viewHeroes)();
-  for (const s of v.querySelectorAll('details > summary')) if (open.includes(s.textContent)) s.parentElement.open = true;
+  const dkey = d => d.dataset.key || (d.querySelector('summary') || {}).textContent;
+  const open = new Set([...v.querySelectorAll('details[open]')].map(dkey));
+  try {
+    v.innerHTML = MODALS[ui.modal] ? MODALS[ui.modal]() : (VIEWS[ui.tab] || viewHeroes)();
+  } catch (err) {
+    console.error(err);
+    v.innerHTML = `<section class="card"><p class="alert">Something went wrong drawing this screen.</p><p class="small">${esc(err.message)}</p><button class="btn" data-act="closeModal">Try again</button></section>`;
+  }
+  for (const d of v.querySelectorAll('details')) if (open.has(dkey(d)) && d.dataset.key !== 'cur-move') d.open = true;
+  for (const [id, val] of Object.entries(ui.drafts)) { const el = document.getElementById(id); if (el && !el.value) el.value = val; }
   v.scrollTop = scroll;
   document.getElementById('campname').textContent = S().meta.name;
   for (const b of document.querySelectorAll('nav button')) b.classList.toggle('on', b.dataset.tab === ui.tab && !ui.modal);
   const dot = document.getElementById('syncdot');
   dot.className = 'dot ' + (sync.code ? sync.status : 'off');
-  dot.title = sync.code ? `Synced: ${sync.code} (${sync.status})` : 'Not syncing';
+  dot.title = sync.code ? `Synced: ${sync.code} (${sync.status})${sync.detail ? '. ' + sync.detail : ''}` : 'Not syncing';
   ui.pendingRender = false;
 }
 
+let pointerDown = false;
 function requestRender() {
+  if (pointerDown) { ui.pendingRender = true; return; } // a tap is in progress: let its click land first
   const a = document.activeElement;
   if (a && $view().contains(a) && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA') && a.type !== 'checkbox') {
     ui.pendingRender = true; // don't yank the field out from under someone typing
@@ -498,7 +512,8 @@ function clampSet(path, value, min, max) {
 function doActionRoll() {
   const h = S().heroes[ui.rollHero] || currentHero();
   if (!h) return;
-  const opt = rollStatOptions(h).find(o => o[0] === ui.rollStat) || ['none', 'No stat', 0];
+  const opts = rollStatOptions(h);
+  const opt = opts.find(o => o[0] === ui.rollStat) || opts[0];
   const r = actionRoll({ stat: opt[2], adds: ui.rollAdds, momentum: h.momentum });
   const move = D.moveById[ui.moveId];
   r.heroId = h.id;
@@ -564,7 +579,7 @@ const actions = {
     if (m.roll !== 'action_roll') {
       // Not rollable from the action roller: open it in the moves list instead.
       ui.moveId = ''; ui.moveQuery = m.name; render();
-      const d = $view().querySelector('.movetext:not([open])');
+      const d = $view().querySelector(`details[data-key="m-${CSS.escape(m.id)}"]`);
       if (d) { d.open = true; d.scrollIntoView(); }
     } else if (mt) mt.scrollIntoView({ block: 'nearest' });
   },
@@ -573,6 +588,7 @@ const actions = {
     let text = q.value.trim();
     const show = (el && el.dataset.walk ? 'Walk me through it: ' : '') + text;
     if (!text || ui.asking) return;
+    delete ui.drafts.askq;
     if (el && el.dataset.walk) text = `Walk us through this situation step by step as a sequence of moves, using our current heroes and their assets. For each step give the move, the stat to roll, and what each result would mean. Situation: ${text}`;
     ui.chat = (ui.chat || []).concat({ role: 'user', text, show });
     ui.asking = true; render();
@@ -588,8 +604,9 @@ const actions = {
   askClear() { ui.chat = []; saveChat(); render(); },
   saveAnswer(el) {
     const a = ui.chat[+el.dataset.i], qn = ui.chat[+el.dataset.i - 1];
+    if (a.saved) return;
+    a.saved = true; saveChat();
     log(`**Rules: ${qn ? (qn.show || qn.text) : ''}**\n\n${a.text}`, 'oracle');
-    el.textContent = 'Saved';
   },
   inc(el) { const s = el.closest('.stepper'); const p = JSON.parse(s.dataset.path); const cur = p[0] === '__ui' ? ui[p[1]] : store.get(p) || 0; clampSet(p, cur + 1, +s.dataset.min, +s.dataset.max); },
   dec(el) { const s = el.closest('.stepper'); const p = JSON.parse(s.dataset.path); const cur = p[0] === '__ui' ? ui[p[1]] : store.get(p) || 0; clampSet(p, cur - 1, +s.dataset.min, +s.dataset.max); },
@@ -623,7 +640,7 @@ const actions = {
   addNemesis() { const n = { id: uid(), created: Date.now(), name: '', gimmick: '', rank: 'extreme', scheme: '', segments: 8, filled: 2, status: 'large' }; store.set(['nemeses', n.id], n); },
   lockUp(el) {
     const n = S().nemeses[el.dataset.id];
-    store.set(['nemeses', n.id], { ...n, status: 'locked', filled: 0, scheme: '' });
+    for (const [k, v] of [['status', 'locked'], ['filled', 0], ['scheme', '']]) store.set(['nemeses', n.id, k], v);
     log(`**${n.name || 'A Nemesis'} is locked up.** Scheme cleared.`, 'roll');
   },
   escapeCheck() {
@@ -632,8 +649,8 @@ const actions = {
     const d = rnd(10);
     if (d <= D.rules.nemesisEscape.max) {
       const n = locked[rnd(locked.length) - 1];
-      const nextRank = RANKS[Math.min(RANKS.length - 1, RANKS.indexOf(n.rank) + 1)];
-      store.set(['nemeses', n.id], { ...n, status: 'large', rank: nextRank, filled: 0, scheme: '' });
+      const nextRank = RANKS[Math.min(RANKS.length - 1, Math.max(0, RANKS.indexOf(n.rank)) + 1)];
+      for (const [k, v] of [['status', 'large'], ['rank', nextRank], ['filled', 0], ['scheme', '']]) store.set(['nemeses', n.id, k], v);
       log(`**Escape! ${n.name || 'A Nemesis'} is out** (d10: ${d}). Rank is now ${nextRank}. Give them a new scheme.`, 'roll');
     } else {
       log(`Escape check: d10 ${d}. Everyone stays locked up.`, 'roll');
@@ -645,6 +662,10 @@ const actions = {
     const r = ui.lastRoll;
     if (!r || !r.burn) return;
     const h = S().heroes[r.heroId];
+    if (!h) { ui.lastRoll = null; render(); return; }
+    const now = actionRoll({ stat: r.stat, adds: r.adds, momentum: h.momentum, dice: { a: r.a, c1: r.c1, c2: r.c2 } });
+    if (!now.burn) { r.burn = null; render(); return; } // momentum changed since the roll
+    r.burn = now.burn;
     r.burned = true;
     store.set(['heroes', h.id, 'momentum'], momentumLimits(h).reset);
     log(`**Burned momentum** (${r.burn.score}): now a ${RESULT_LABEL[r.burn.result].toLowerCase()}. Momentum reset.`, 'roll');
@@ -678,6 +699,7 @@ const actions = {
   addEntry() {
     const t = document.getElementById('jtext');
     if (!t.value.trim()) return;
+    delete ui.drafts.jtext;
     log(t.value.trim(), 'note'); t.value = '';
   },
   async host() {
@@ -717,7 +739,7 @@ function buildContext() {
     const ss = D.moves.filter(m => m.id.startsWith('ss/')).map(m => `### ${m.name} (Supersworn)\n${m.text}`).join('\n\n');
     const sf = D.moves.filter(m => m.id.startsWith('sf/')).map(m => `### ${m.name} (Starforged, ${m.cat})\n${m.text}`).join('\n\n');
     const assets = D.assets.filter(a => a.id.startsWith('ss/')).map(a => `### ${a.name} (${a.cat})\n${a.requirement ? a.requirement + '\n' : ''}${a.note ? a.note + '\n' : ''}${a.abilities.map((t, i) => `${i + 1}. ${t}`).join('\n')}`).join('\n\n');
-    rulesText = `${D.notes}\n\n## Moves\n\n${ss}\n\n${sf}\n\n## Supersworn assets\n\n${assets}`;
+    rulesText = `${D.appGuide}\n\n${D.notes}\n\n## Moves\n\n${ss}\n\n${sf}\n\n## Supersworn assets\n\n${assets}`;
   }
   const s = S();
   const heroLines = sorted(s.heroes).map(h => {
@@ -759,7 +781,16 @@ function wire() {
   });
   document.addEventListener('change', e => {
     const el = e.target;
-    if (el.dataset.toggle) { store.set(JSON.parse(el.dataset.toggle), el.checked); return; }
+    if (el.dataset.toggle) {
+      const p = JSON.parse(el.dataset.toggle);
+      store.set(p, el.checked);
+      if (p[0] === 'heroes' && p[2] === 'impacts') {
+        const h = S().heroes[p[1]];
+        const { max } = momentumLimits(h);
+        if (h && h.momentum > max) store.set(['heroes', h.id, 'momentum'], max);
+      }
+      return;
+    }
     if (el.dataset.bind) {
       let v = el.value;
       if (el.dataset.num) v = +v;
@@ -776,7 +807,12 @@ function wire() {
     }
     if (el.id === 'importfile' && el.files[0]) {
       el.files[0].text().then(t => {
-        try { const data = JSON.parse(t); if (!data.meta) throw new Error(); data.meta.id = data.meta.id || uid(); sync.leave(); store.replace(data); ui.modal = null; render(); }
+        try {
+          const data = JSON.parse(t);
+          if (!data || typeof data !== 'object' || !data.meta) throw new Error();
+          if (store.campaigns().some(c => c.id === data.meta.id)) data.meta = { ...data.meta, id: uid(), name: (data.meta.name || 'Campaign') + ' (imported)' };
+          sync.leave(); store.replace(data); ui.modal = null; render();
+        }
         catch { showErr('That file is not a Supersworn backup.'); }
       });
     }
@@ -792,14 +828,26 @@ function wire() {
       if (again) { again.focus(); again.setSelectionRange(pos, pos); }
     }
   });
+  document.addEventListener('input', e => { if (e.target.dataset && e.target.dataset.draft) ui.drafts[e.target.id] = e.target.value; });
   document.addEventListener('focusout', () => setTimeout(() => { if (ui.pendingRender) requestRender(); }, 0));
+  // Hold re-renders while a finger is down so the button being tapped still exists when its click fires.
+  let releaseTimer = null;
+  const release = () => { clearTimeout(releaseTimer); pointerDown = false; if (ui.pendingRender) requestRender(); };
+  document.addEventListener('pointerdown', () => { pointerDown = true; clearTimeout(releaseTimer); }, true);
+  document.addEventListener('pointerup', () => { clearTimeout(releaseTimer); releaseTimer = setTimeout(release, 400); }, true);
+  document.addEventListener('pointercancel', release, true);
+  document.addEventListener('click', () => setTimeout(release, 0), true);
   store.onChange(() => requestRender());
   sync.onStatus(() => requestRender());
 }
 
 async function main() {
   store.load();
-  await loadData();
+  try { await loadData(); }
+  catch (err) {
+    $view().innerHTML = '<section class="card"><p class="alert">Could not load the game data.</p><p class="small">Check your connection and reload. If you installed the app, open it once while online.</p></section>';
+    return;
+  }
   wire();
   render();
   let saved = null;

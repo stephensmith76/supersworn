@@ -203,3 +203,13 @@ nav button { font-size: 16px; letter-spacing: .03em; }
 .tipline { font-size: 13px; border-left: 3px solid var(--accent); padding-left: 8px; color: var(--muted); }
 select.pos.bad { border-color: var(--miss); color: var(--miss); }
 select.pos.ok { border-color: var(--strong); color: var(--strong); }
+/* review fixes: 16px fields stop iOS zoom; bigger tap targets */
+input, select, textarea, .field input, .form select { font-size: 16px; }
+.step { width: 40px; height: 40px; }
+.pip { width: 36px; height: 36px; }
+.pips { gap: 5px; }
+.btn.sm { min-height: 38px; padding: 6px 12px; }
+.chip { min-height: 40px; }
+.entry .x { min-width: 40px; min-height: 40px; }
+.dot.offline { background: var(--weak); }
+.grid5 { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
