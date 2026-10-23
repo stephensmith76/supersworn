@@ -1,0 +1,1840 @@
+{
+ "license": "Supersworn by its original author, revised for street-level play",
+ "rules": {
+  "stats": [
+   "edge",
+   "heart",
+   "iron",
+   "shadow",
+   "wits"
+  ],
+  "statArray": [
+   3,
+   2,
+   2,
+   1,
+   1
+  ],
+  "meters": {
+   "health": 5,
+   "spirit": 5
+  },
+  "shared": {
+   "resources": 5
+  },
+  "heat": {
+   "max": 5
+  },
+  "legacies": [
+   "quests",
+   "bonds",
+   "heroics"
+  ],
+  "impacts": [
+   "wounded",
+   "shaken",
+   "unprepared",
+   "permanently harmed",
+   "traumatized",
+   "doomed",
+   "tormented",
+   "indebted"
+  ],
+  "ranks": [
+   "troublesome",
+   "dangerous",
+   "formidable",
+   "extreme",
+   "epic"
+  ],
+  "nemesisEscape": {
+   "die": 10,
+   "max": 3
+  },
+  "trackTypes": [
+   "vow",
+   "case",
+   "patrol",
+   "combat",
+   "connection",
+   "scene challenge",
+   "expedition",
+   "other"
+  ],
+  "truths": [
+   "The city is rotten from the top down.",
+   "Supers are urban legend.",
+   "There are only a handful of you.",
+   "The police see you as a criminal.",
+   "The public is split.",
+   "Training and Technology are the main sources of power.",
+   "There is one big prison and one asylum.",
+   "The night belongs to you and to them.",
+   "This is still a hopeful place."
+  ]
+ },
+ "moves": [
+  {
+   "id": "ss/go_on_patrol",
+   "cat": "Patrol",
+   "name": "Go On Patrol",
+   "roll": "action_roll",
+   "stats": [
+    "edge",
+    "shadow",
+    "heart",
+    "iron",
+    "wits"
+   ],
+   "oracles": [
+    "ss/trouble",
+    "ss/building"
+   ],
+   "text": "When you __go on patrol__, pick an area (a block, neighborhood or district) and give the patrol a rank based on how dangerous the area is and how long you're out. Then pick your approach:\n\n  * Moving fast across rooftops or streets: Roll +edge\n  * Staying out of sight: Roll +shadow\n  * Talking to the people who live and work there: Roll +heart\n  * Walking a beat boldly so people see you: Roll +iron\n  * Using gear, scanners or reasoning to predict trouble: Roll +wits\n\nOn a __strong hit__, you spot Trouble before it happens. Mark progress and roll on the Trouble oracle (or choose). With a match, also Uncover a Plot.\n\nOn a __weak hit__, as above, but the Trouble is already happening or catches you off guard. Choose one: make a suffer move (-2) or two suffer moves (-1); advance a Nemesis scheme clock; or take +1 Heat. At Heat 2+, police are also on the scene.\n\nOn a __miss__, don't mark progress. You arrive too late or walk into something bad. Pay the Price. With a match, All Hell Breaks Loose.\n\nWith a match on any result, check for Nemesis escapes."
+  },
+  {
+   "id": "ss/uncover_a_plot",
+   "cat": "Patrol",
+   "name": "Uncover a Plot",
+   "roll": "no_roll",
+   "stats": [],
+   "oracles": [
+    "ss/plot"
+   ],
+   "text": "When your handling of a Trouble reveals something bigger, roll on the Plot oracle (or choose). Decide whether it's a new plot or a layer of one already in play; if you can't decide, an even match die means an existing plot and odd means new. Envision how your skills let you see what others missed. Mark two ticks on your Heroics legacy track, then Open a Case if you want to pursue it."
+  },
+  {
+   "id": "ss/all_hell",
+   "cat": "Patrol",
+   "name": "All Hell Breaks Loose",
+   "roll": "no_roll",
+   "stats": [],
+   "oracles": [
+    "ss/all_hell"
+   ],
+   "text": "When a Trouble turns into a catastrophe, roll on the All Hell Breaks Loose oracle (or choose). Treat the result as an immediate threat: usually a Scene Challenge, sometimes a fight."
+  },
+  {
+   "id": "ss/finish_patrol",
+   "cat": "Patrol",
+   "name": "Finish Patrol",
+   "roll": "progress_roll",
+   "stats": [],
+   "track": "patrol",
+   "text": "When your patrol comes to an end, roll the challenge dice and compare to your progress.\n\nOn a __strong hit__, the area is safer and the locals appreciate it. Mark a reward on your Heroics legacy track per the patrol's rank (troublesome 1 tick, dangerous 2 ticks, formidable 1 box, extreme 2 boxes, epic 3 boxes). Lose 1 Heat.\n\nOn a __weak hit__, the area is safer, but you left a bad impression or not much of one. Make the reward one rank lower and envision how the locals see you now.\n\nOn a __miss__, you overlooked a grave danger, or convinced the locals you're worse than the criminals. Choose one:\n\n  * Abandon your patrol: envision the cost to the area or your reputation, Pay the Price, and take +1 Heat.\n  * Accept your responsibility: roll both challenge dice, take the lower number and clear that many progress boxes. Raise the patrol's rank by one (if not epic) and return to fix your mistake."
+  },
+  {
+   "id": "ss/open_a_case",
+   "cat": "Case",
+   "name": "Open a Case",
+   "roll": "no_roll",
+   "stats": [],
+   "oracles": [
+    "ss/clue"
+   ],
+   "text": "When you __commit to solving a crime or untangling a plot__, name the case and give it a rank (Dangerous or Formidable is typical). Usually a case supports an iron vow, so tie it to one. If there's no vow yet, Swear an Iron Vow too. Start the case with one clue: roll on the Clue oracle."
+  },
+  {
+   "id": "ss/work_the_case",
+   "cat": "Case",
+   "name": "Work the Case",
+   "roll": "action_roll",
+   "stats": [
+    "wits",
+    "heart",
+    "iron",
+    "shadow",
+    "edge"
+   ],
+   "oracles": [
+    "ss/clue"
+   ],
+   "text": "When you __follow a lead on an open case__, envision the lead and pick your approach:\n\n  * Examining evidence, records or a crime scene: Roll +wits\n  * Working your contacts or interviewing witnesses: Roll +heart\n  * Shaking someone down: Roll +iron\n  * Surveillance, a break-in, or tailing someone: Roll +shadow\n  * Chasing a suspect or racing to a scene in time: Roll +edge\n\nOn a __strong hit__, mark progress on the case and roll a clue (or choose one).\n\nOn a __weak hit__, mark progress and roll a clue, but choose one: make a suffer move (-1); take +1 Heat; or advance a Nemesis scheme clock (someone heard you asking around).\n\nOn a __miss__, the lead goes cold or turns on you. Pay the Price. With a match, you've been fed a false lead: the next time you Solve the Case, roll one challenge die twice and use the higher result."
+  },
+  {
+   "id": "ss/solve_the_case",
+   "cat": "Case",
+   "name": "Solve the Case",
+   "roll": "progress_roll",
+   "stats": [],
+   "track": "case",
+   "text": "When you __put the pieces together__, roll the challenge dice and compare to your progress.\n\nOn a __strong hit__, you know who did it, how, and where to find them. Reach a Milestone on the linked vow and take +2 momentum. You choose when and where to confront them, so the confrontation's rank drops one step.\n\nOn a __weak hit__, you know who, but they know you're coming. Reach a Milestone on the linked vow, then advance their scheme clock or face an ambush.\n\nOn a __miss__, you got it wrong. Choose one:\n\n  * Accuse the wrong person: an innocent pays. Take +2 Heat and Pay the Price.\n  * Keep digging: roll both challenge dice, take the lower number and clear that many progress boxes. Raise the case's rank by one and keep working it."
+  },
+  {
+   "id": "ss/nemesis_escape",
+   "cat": "Nemesis",
+   "name": "The Revolving Door",
+   "roll": "no_roll",
+   "stats": [],
+   "text": "When you defeat a Nemesis, mark them Locked up and clear their scheme clock.\n\nWhen you roll a match on Go On Patrol while any Nemesis is locked up, roll d10. On 1 to 3, one of them escapes. Raise their rank by one (max Epic) and give them a new scheme.\n\nA Nemesis at Epic rank who is beaten again can be retired for good."
+  },
+  {
+   "id": "ss/scheme_clocks",
+   "cat": "Nemesis",
+   "name": "Scheme Clocks",
+   "roll": "no_roll",
+   "stats": [],
+   "oracles": [
+    "ss/all_hell"
+   ],
+   "text": "Advance one Nemesis's scheme clock when:\n\n  * you roll a match on Go On Patrol, Gather Information or Work the Case\n  * you choose to on a weak hit with Go On Patrol or Work the Case\n  * a session ends and a Nemesis who is at large went unopposed\n\nWhen a scheme clock fills, the plot goes off. Roll on All Hell Breaks Loose, then Swear an Iron Vow (Extreme) to stop it or clean up after it."
+  },
+  {
+   "id": "ss/heat",
+   "cat": "Heat",
+   "name": "Heat",
+   "roll": "no_roll",
+   "stats": [],
+   "text": "Heat (0 to 5, per hero) is how hard the law and the press are looking for you.\n\n__Gain Heat__ (+1 unless noted):\n\n  * a miss on Compel, or on any move involving police or officials\n  * you're seen on camera, or a witness gets a good look at you\n  * you use lethal force, or break into a public building\n  * Bloodthirsty triggers, or you take the brutal-kill option (+2)\n  * a scheme clock fills while you were known to be on the case\n\n__Lose Heat__ (-1):\n\n  * a strong hit on Finish Patrol\n  * you lie low for a session, or a press or police Connection covers for you\n  * you hand evidence to an honest cop instead of acting on it yourself\n\n__Effects__\n\n  * 0-1: Rumors only.\n  * 2-3: Your description is in the papers. Vigilante's police ability stops working. On a weak hit with Go On Patrol, police are on the scene.\n  * 4: Task force. Every patrol miss includes cops. Secret Identity rolls take -1.\n  * 5: Manhunt. Face Danger +shadow or your HQ is raided. Then drop Heat to 3."
+  },
+  {
+   "id": "ss/rescues",
+   "cat": "Patrol",
+   "name": "Rescues and Disasters",
+   "roll": "no_roll",
+   "stats": [],
+   "text": "Use Begin the Scene (Scene Challenge) for burning buildings, runaway trains and hostage standoffs. The tension clock is the bomb timer, the fire spreading, or the gunman's patience. When you succeed, mark one tick on Heroics for a Dangerous challenge, or two for Formidable or higher."
+  }
+ ],
+ "oracles": [
+  {
+   "id": "ss/trouble",
+   "group": "Supersworn",
+   "name": "Trouble",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     5,
+     "Mugging or purse snatch"
+    ],
+    [
+     6,
+     10,
+     "Corner store hold-up"
+    ],
+    [
+     11,
+     15,
+     "Drug deal going bad"
+    ],
+    [
+     16,
+     20,
+     "Gang fight in the street"
+    ],
+    [
+     21,
+     25,
+     "Break-in at a home or business"
+    ],
+    [
+     26,
+     30,
+     "Car theft or a chop shop at work"
+    ],
+    [
+     31,
+     35,
+     "Protection racket shakedown"
+    ],
+    [
+     36,
+     40,
+     "Smuggling at the docks or rail yard"
+    ],
+    [
+     41,
+     45,
+     "Kidnapping or missing person"
+    ],
+    [
+     46,
+     50,
+     "Armed robbery (bank, armored car, jeweler)"
+    ],
+    [
+     51,
+     55,
+     "Crooked cops roughing someone up"
+    ],
+    [
+     56,
+     58,
+     "Hostage situation"
+    ],
+    [
+     59,
+     60,
+     "A costumed criminal at work (a Nemesis, or a new one)"
+    ],
+    [
+     61,
+     64,
+     "Building fire"
+    ],
+    [
+     65,
+     67,
+     "Car crash or runaway vehicle"
+    ],
+    [
+     68,
+     70,
+     "Collapse (building, scaffold, sinkhole)"
+    ],
+    [
+     71,
+     73,
+     "Chemical or gas leak"
+    ],
+    [
+     74,
+     76,
+     "Someone in crisis who needs talking down"
+    ],
+    [
+     77,
+     79,
+     "Blackout or water main break"
+    ],
+    [
+     80,
+     82,
+     "First responders overwhelmed: roll twice more"
+    ],
+    [
+     83,
+     85,
+     "Lost child or runaway"
+    ],
+    [
+     86,
+     88,
+     "Elderly neighbor in trouble"
+    ],
+    [
+     89,
+     91,
+     "Kids being bullied or recruited by a gang"
+    ],
+    [
+     92,
+     94,
+     "Shop owner being pushed out by a landlord or the mob"
+    ],
+    [
+     95,
+     97,
+     "Someone hungry, cold or sick on the street"
+    ],
+    [
+     98,
+     100,
+     "An animal in danger"
+    ]
+   ]
+  },
+  {
+   "id": "ss/plot",
+   "group": "Supersworn",
+   "name": "Plot",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     5,
+     "A strange symbol starts showing up around the city"
+    ],
+    [
+     6,
+     10,
+     "Rival crime bosses meet in secret"
+    ],
+    [
+     11,
+     15,
+     "A loudmouth thug lets slip a name"
+    ],
+    [
+     16,
+     20,
+     "Two unrelated troubles turn out to be connected"
+    ],
+    [
+     21,
+     25,
+     "A stash of blackmail on a city official"
+    ],
+    [
+     26,
+     30,
+     "Criminals all wearing the same uniform or theme"
+    ],
+    [
+     31,
+     35,
+     "Someone is staking out a high-value target"
+    ],
+    [
+     36,
+     40,
+     "Police arrive too fast and start losing evidence"
+    ],
+    [
+     41,
+     45,
+     "Gear far too expensive for these crooks"
+    ],
+    [
+     46,
+     50,
+     "Details of an incoming shipment"
+    ],
+    [
+     51,
+     55,
+     "A hideout with a stockpile of weapons or explosives"
+    ],
+    [
+     56,
+     60,
+     "Someone you trust tells you to drop it"
+    ],
+    [
+     61,
+     65,
+     "A device nobody can identify"
+    ],
+    [
+     66,
+     70,
+     "Proof a beaten foe is active again"
+    ],
+    [
+     71,
+     75,
+     "Photos of a city official meeting someone they shouldn't"
+    ],
+    [
+     76,
+     80,
+     "Real estate being bought up block by block"
+    ],
+    [
+     81,
+     85,
+     "A new drug on the street with odd side effects"
+    ],
+    [
+     86,
+     90,
+     "Witnesses to an old case are disappearing"
+    ],
+    [
+     91,
+     95,
+     "A Nemesis is recruiting from the prison or asylum"
+    ],
+    [
+     96,
+     100,
+     "Evidence of a new villain"
+    ]
+   ]
+  },
+  {
+   "id": "ss/clue",
+   "group": "Supersworn",
+   "name": "Clue",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     5,
+     "A witness saw something but is too scared to say"
+    ],
+    [
+     6,
+     10,
+     "A witness is lying, and you can tell"
+    ],
+    [
+     11,
+     15,
+     "Security footage, but someone tampered with it"
+    ],
+    [
+     16,
+     20,
+     "A calling card left on purpose"
+    ],
+    [
+     21,
+     25,
+     "Chemical or industrial residue"
+    ],
+    [
+     26,
+     30,
+     "A money trail to a shell company"
+    ],
+    [
+     31,
+     35,
+     "A phone or ledger with names in it"
+    ],
+    [
+     36,
+     40,
+     "A forged alibi"
+    ],
+    [
+     41,
+     45,
+     "The scene was staged"
+    ],
+    [
+     46,
+     50,
+     "A distinctive weapon or tool"
+    ],
+    [
+     51,
+     55,
+     "Something missing that should be there"
+    ],
+    [
+     56,
+     60,
+     "A link to an older, unsolved crime"
+    ],
+    [
+     61,
+     65,
+     "A tattoo, patch or gang sign"
+    ],
+    [
+     66,
+     70,
+     "A matchbook, receipt or ticket stub from a specific place"
+    ],
+    [
+     71,
+     75,
+     "Someone paid off a guard, clerk or cop"
+    ],
+    [
+     76,
+     80,
+     "Fibers, blood or prints that point to a type of person"
+    ],
+    [
+     81,
+     85,
+     "A note in code"
+    ],
+    [
+     86,
+     90,
+     "An insider tipped off the criminals"
+    ],
+    [
+     91,
+     95,
+     "The victim wasn't who they claimed to be"
+    ],
+    [
+     96,
+     100,
+     "A clue planted to point at you"
+    ]
+   ]
+  },
+  {
+   "id": "ss/all_hell",
+   "group": "Supersworn",
+   "name": "All Hell Breaks Loose",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     10,
+     "A fire spreads across the block"
+    ],
+    [
+     11,
+     20,
+     "Riot"
+    ],
+    [
+     21,
+     30,
+     "Prison or asylum break"
+    ],
+    [
+     31,
+     40,
+     "All-out gang war"
+    ],
+    [
+     41,
+     50,
+     "You're trapped or ambushed"
+    ],
+    [
+     51,
+     60,
+     "A villain's plot goes off"
+    ],
+    [
+     61,
+     70,
+     "Blackout across the district"
+    ],
+    [
+     71,
+     80,
+     "A crooked cop frames you for the crime"
+    ],
+    [
+     81,
+     90,
+     "Someone puts a hit out on your ally or Connection"
+    ],
+    [
+     91,
+     100,
+     "Lockdown: police or federal agents seal off the area"
+    ]
+   ]
+  },
+  {
+   "id": "ss/community",
+   "group": "Supersworn",
+   "name": "Community",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     5,
+     "Neighborhood watch"
+    ],
+    [
+     6,
+     10,
+     "A police precinct or squad"
+    ],
+    [
+     11,
+     15,
+     "Fire station or ambulance crew"
+    ],
+    [
+     16,
+     20,
+     "ER night shift"
+    ],
+    [
+     21,
+     25,
+     "Newsroom or tabloid staff"
+    ],
+    [
+     26,
+     30,
+     "Dockworkers' union"
+    ],
+    [
+     31,
+     35,
+     "A crime family"
+    ],
+    [
+     36,
+     40,
+     "A street gang"
+    ],
+    [
+     41,
+     45,
+     "Asylum or prison staff"
+    ],
+    [
+     46,
+     50,
+     "Homeless encampment"
+    ],
+    [
+     51,
+     55,
+     "Church or mosque congregation"
+    ],
+    [
+     56,
+     60,
+     "Diner or bar regulars"
+    ],
+    [
+     61,
+     65,
+     "Cab and rideshare drivers"
+    ],
+    [
+     66,
+     70,
+     "Boxing gym regulars"
+    ],
+    [
+     71,
+     75,
+     "Pawn shop and fence network"
+    ],
+    [
+     76,
+     80,
+     "College students and professors"
+    ],
+    [
+     81,
+     85,
+     "Wealthy donors and country club set"
+    ],
+    [
+     86,
+     90,
+     "City hall staffers"
+    ],
+    [
+     91,
+     95,
+     "A secret society or cult"
+    ],
+    [
+     96,
+     100,
+     "Transit workers"
+    ]
+   ]
+  },
+  {
+   "id": "ss/building",
+   "group": "Supersworn",
+   "name": "Trouble Building (2d10)",
+   "dice": "2d10",
+   "rows": [
+    [
+     2,
+     2,
+     "Residential (townhouse, apartment building, nursing home)"
+    ],
+    [
+     3,
+     3,
+     "Entertainment (theater, bowling alley, club)"
+    ],
+    [
+     4,
+     4,
+     "Offices"
+    ],
+    [
+     5,
+     5,
+     "Laboratory"
+    ],
+    [
+     6,
+     6,
+     "Retail (stores, malls, gas station)"
+    ],
+    [
+     7,
+     7,
+     "School (elementary, secondary, college dorm)"
+    ],
+    [
+     8,
+     8,
+     "Warehouse"
+    ],
+    [
+     9,
+     9,
+     "Place of worship"
+    ],
+    [
+     10,
+     10,
+     "First responder building (police, fire, hospital)"
+    ],
+    [
+     11,
+     11,
+     "Public service building (library, museum, courthouse)"
+    ],
+    [
+     12,
+     12,
+     "Prison"
+    ],
+    [
+     13,
+     13,
+     "Hotel or motel"
+    ],
+    [
+     14,
+     14,
+     "Storage facility"
+    ],
+    [
+     15,
+     15,
+     "Restaurant (pop-up, full service, bar, pub)"
+    ],
+    [
+     16,
+     16,
+     "Parking garage"
+    ],
+    [
+     17,
+     17,
+     "Fitness center (gym, boxing)"
+    ],
+    [
+     18,
+     18,
+     "Power plant"
+    ],
+    [
+     19,
+     19,
+     "Manufacturing (products, materials, resources)"
+    ],
+    [
+     20,
+     20,
+     "Mixed use building (roll twice)"
+    ]
+   ]
+  },
+  {
+   "id": "ss/loc/location",
+   "group": "Supersworn: City Location",
+   "name": "City Location",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     50,
+     "@ss/loc/residential"
+    ],
+    [
+     51,
+     65,
+     "@ss/loc/commercial"
+    ],
+    [
+     66,
+     75,
+     "@ss/loc/industrial"
+    ],
+    [
+     76,
+     80,
+     "@ss/loc/infrastructure"
+    ],
+    [
+     81,
+     95,
+     "@ss/loc/institutional"
+    ],
+    [
+     96,
+     100,
+     "Vacant"
+    ]
+   ]
+  },
+  {
+   "id": "ss/loc/residential",
+   "group": "Supersworn: City Location",
+   "name": "Residential",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     10,
+     "Bungalow"
+    ],
+    [
+     11,
+     20,
+     "Cottage"
+    ],
+    [
+     21,
+     30,
+     "Split-level"
+    ],
+    [
+     31,
+     40,
+     "Duplex"
+    ],
+    [
+     41,
+     50,
+     "Townhouse"
+    ],
+    [
+     51,
+     60,
+     "Walk-up apartment building (1 to 5 floors)"
+    ],
+    [
+     61,
+     70,
+     "Mid-rise apartment building (6 to 10 floors)"
+    ],
+    [
+     71,
+     80,
+     "High-rise or skyscraper (10+ floors)"
+    ],
+    [
+     81,
+     85,
+     "Retirement home"
+    ],
+    [
+     86,
+     90,
+     "Nursing home"
+    ],
+    [
+     91,
+     95,
+     "Dormitory"
+    ],
+    [
+     96,
+     98,
+     "Prison"
+    ],
+    [
+     99,
+     100,
+     "@ss/loc/commercial"
+    ]
+   ]
+  },
+  {
+   "id": "ss/loc/commercial",
+   "group": "Supersworn: City Location",
+   "name": "Commercial",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     20,
+     "Low-rise office"
+    ],
+    [
+     21,
+     30,
+     "Mid-rise office"
+    ],
+    [
+     31,
+     39,
+     "High-rise office building"
+    ],
+    [
+     40,
+     44,
+     "Strip mall"
+    ],
+    [
+     45,
+     53,
+     "Shopping mall"
+    ],
+    [
+     54,
+     55,
+     "Boutique or upscale mall"
+    ],
+    [
+     56,
+     57,
+     "Outlet mall"
+    ],
+    [
+     58,
+     60,
+     "Big box store"
+    ],
+    [
+     61,
+     63,
+     "Big box shopping center"
+    ],
+    [
+     64,
+     65,
+     "Outlet mall"
+    ],
+    [
+     66,
+     67,
+     "Pop-up or seasonal store"
+    ],
+    [
+     68,
+     73,
+     "Hotel"
+    ],
+    [
+     74,
+     79,
+     "Motel"
+    ],
+    [
+     80,
+     82,
+     "Casino"
+    ],
+    [
+     83,
+     84,
+     "Self-storage"
+    ],
+    [
+     85,
+     86,
+     "Car wash"
+    ],
+    [
+     87,
+     88,
+     "Theme or amusement park"
+    ],
+    [
+     89,
+     90,
+     "Bowling alley"
+    ],
+    [
+     91,
+     92,
+     "Marina"
+    ],
+    [
+     93,
+     95,
+     "Theater"
+    ],
+    [
+     96,
+     98,
+     "Funeral home"
+    ],
+    [
+     99,
+     100,
+     "@ss/loc/industrial"
+    ]
+   ]
+  },
+  {
+   "id": "ss/loc/industrial",
+   "group": "Supersworn: City Location",
+   "name": "Industrial",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     8,
+     "Product manufacturing (food, plastic, paper, leather, textiles, wood)"
+    ],
+    [
+     9,
+     10,
+     "Heavy manufacturing (train or aircraft parts, machine tools, chemicals, electrical, automotive)"
+    ],
+    [
+     11,
+     40,
+     "Warehouse"
+    ],
+    [
+     41,
+     45,
+     "Cold storage warehouse"
+    ],
+    [
+     46,
+     55,
+     "Distribution center"
+    ],
+    [
+     56,
+     65,
+     "Low-rise office building"
+    ],
+    [
+     66,
+     75,
+     "Mid-rise office building"
+    ],
+    [
+     76,
+     85,
+     "High-rise office building"
+    ],
+    [
+     86,
+     92,
+     "Industrial laboratory"
+    ],
+    [
+     93,
+     95,
+     "Data center"
+    ],
+    [
+     96,
+     98,
+     "Call center"
+    ],
+    [
+     99,
+     100,
+     "@ss/loc/infrastructure"
+    ]
+   ]
+  },
+  {
+   "id": "ss/loc/infrastructure",
+   "group": "Supersworn: City Location",
+   "name": "Infrastructure",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     12,
+     "Composting facility"
+    ],
+    [
+     13,
+     21,
+     "Desalination plant"
+    ],
+    [
+     22,
+     42,
+     "Waste transfer station (dump)"
+    ],
+    [
+     43,
+     63,
+     "Power plant"
+    ],
+    [
+     64,
+     79,
+     "Power substation"
+    ],
+    [
+     80,
+     87,
+     "Power converter station"
+    ],
+    [
+     88,
+     98,
+     "Radio transmitter building"
+    ],
+    [
+     99,
+     100,
+     "@ss/loc/institutional"
+    ]
+   ]
+  },
+  {
+   "id": "ss/loc/institutional",
+   "group": "Supersworn: City Location",
+   "name": "Institutional",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     2,
+     "Orphanage"
+    ],
+    [
+     3,
+     4,
+     "Cemetery"
+    ],
+    [
+     5,
+     7,
+     "Public school"
+    ],
+    [
+     8,
+     11,
+     "Private school"
+    ],
+    [
+     12,
+     17,
+     "College"
+    ],
+    [
+     18,
+     19,
+     "Arena"
+    ],
+    [
+     20,
+     23,
+     "Recreational sports facility"
+    ],
+    [
+     24,
+     30,
+     "Library"
+    ],
+    [
+     31,
+     32,
+     "Museum"
+    ],
+    [
+     33,
+     34,
+     "Observatory"
+    ],
+    [
+     35,
+     37,
+     "Community hall"
+    ],
+    [
+     38,
+     43,
+     "Place of worship"
+    ],
+    [
+     44,
+     45,
+     "City hall"
+    ],
+    [
+     46,
+     49,
+     "Courthouse"
+    ],
+    [
+     50,
+     52,
+     "Fire station"
+    ],
+    [
+     53,
+     55,
+     "Crime lab"
+    ],
+    [
+     56,
+     58,
+     "Police station"
+    ],
+    [
+     59,
+     60,
+     "Post office"
+    ],
+    [
+     61,
+     62,
+     "Airport"
+    ],
+    [
+     63,
+     69,
+     "Bus station or stop"
+    ],
+    [
+     70,
+     77,
+     "Metro station"
+    ],
+    [
+     78,
+     79,
+     "Railroad station"
+    ],
+    [
+     80,
+     81,
+     "Shipyard"
+    ],
+    [
+     82,
+     92,
+     "Parking garage"
+    ],
+    [
+     93,
+     94,
+     "Film studio"
+    ],
+    [
+     95,
+     98,
+     "Gym"
+    ],
+    [
+     99,
+     100,
+     "@ss/loc/residential"
+    ]
+   ]
+  }
+ ],
+ "assets": [
+  {
+   "id": "ss/hq",
+   "cat": "Headquarters",
+   "name": "Headquarters",
+   "fields": [
+    "type",
+    "description"
+   ],
+   "meters": {
+    "integrity": {
+     "max": 5,
+     "label": "integrity"
+    }
+   },
+   "requirement": "",
+   "note": "A hideout, not a mansion: a diner's back room, a friend's garage, a church basement.",
+   "abilities": [
+    "Home: You may make recover moves at your HQ, but you cannot Sojourn here. When you Advance, you may spend experience to add modules to your HQ.",
+    "Defenses: When you Withstand Damage, you may roll +heart. If you do, Endure Stress (-1) on a weak hit or miss.",
+    "Personal touch: When you Make a Connection with someone in your HQ, add +1 and take +1 momentum on a hit."
+   ]
+  },
+  {
+   "id": "ss/stash",
+   "cat": "Module",
+   "name": "Stash",
+   "fields": [],
+   "meters": {
+    "stash": {
+     "max": 3,
+     "label": "stash"
+    }
+   },
+   "requirement": "",
+   "note": "",
+   "abilities": [
+    "Your HQ can hold up to +3 stash. When you gain Resources, you may put it into stash instead. When you make a move using +resources, you may add +stash. When you Sacrifice Resources, you may suffer -stash for any part of the cost instead.",
+    "When you roll a miss or weak hit on a move to negotiate or barter and have at least 1 stash, you can sweeten the deal: reroll all dice and add +stash. Then suffer -1 stash.",
+    "You may Resupply by going through your stash. If you do, add +stash to your roll. Then -1 stash."
+   ]
+  },
+  {
+   "id": "ss/caretaker",
+   "cat": "Module",
+   "name": "Caretaker",
+   "fields": [
+    "type",
+    "name"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "A friend who patches you up and keeps your secret. May also be a Connection.",
+   "abilities": [
+    "When you Secure an Advantage by talking it over with your Caretaker, add +1 and take +1 momentum on a hit.",
+    "When you Hearten while spending time with this person, add +1 and take +1 momentum on a hit.",
+    "When this person provides healing, add +1 to your Heal roll."
+   ]
+  },
+  {
+   "id": "ss/special_vehicle",
+   "cat": "Module",
+   "name": "Special Vehicle",
+   "fields": [
+    "type"
+   ],
+   "meters": {
+    "integrity": {
+     "max": 3,
+     "label": "integrity"
+    }
+   },
+   "requirement": "",
+   "note": "A beat-up car, a motorcycle, a van full of monitors.",
+   "abilities": [
+    "When you take your vehicle to a location, take +1 momentum when you arrive.",
+    "When you use your vehicle to Face Danger, you may add +integrity and take +1 momentum. If you do and must Pay the Price, you must Withstand Damage.",
+    "Your vehicle has weapons. When you Strike or Clash with your vehicle, add +1. On a strong hit with a match, mark progress."
+   ]
+  },
+  {
+   "id": "ss/kit",
+   "cat": "Module",
+   "name": "Kit",
+   "fields": [
+    "name",
+    "specialty"
+   ],
+   "meters": {
+    "kit": {
+     "max": 3,
+     "label": "kit"
+    }
+   },
+   "requirement": "",
+   "note": "",
+   "abilities": [
+    "Prepared: Kit has its own track (0 to +3). When you Resupply at your HQ, you may put Resources into Kit instead, one for one. When you make a move and say what useful item you pull out, spend 1 Kit to add +1 (+2 when the item is the whole answer, like a lockpick on a lock).",
+    "Specialty: Pick one kind of gear (forensics, medical, electronics, climbing, nonlethal weapons). When you use it, take +1 momentum on a hit.",
+    "Never caught short: When you'd be Unprepared, you may clear all Kit to ignore it for one scene."
+   ]
+  },
+  {
+   "id": "ss/investigator",
+   "cat": "Path",
+   "name": "Investigator",
+   "fields": [],
+   "meters": {},
+   "requirement": "",
+   "note": "",
+   "abilities": [
+    "Crime scene: When you Work the Case by examining evidence or a scene, add +1. On a strong hit, roll two clues and pick one.",
+    "Read the room: When you Gather Information or Compel by questioning someone, add +1. On a strong hit with a match, you catch them in a lie. Mark progress on a related case.",
+    "The whole picture: Once per case, when you Solve the Case, reroll one challenge die."
+   ]
+  },
+  {
+   "id": "ss/genius",
+   "cat": "Path",
+   "name": "Genius",
+   "fields": [],
+   "meters": {},
+   "requirement": "",
+   "note": "",
+   "abilities": [
+    "Planning: When you Secure an Advantage through planning and preparation, add +1 and take +1 momentum on a hit.",
+    "Proper preparation: Before you Face Danger, you may envision how you planned for this. Add +1 and take +1 momentum on a hit.",
+    "Mad scientist: You may build, maintain and Repair powers that have the Technology source."
+   ]
+  },
+  {
+   "id": "ss/secret_identity",
+   "cat": "Path",
+   "name": "Secret Identity",
+   "fields": [
+    "fake identity"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "",
+   "abilities": [
+    "Blending in: Add +1 to +shadow rolls when you're using your fake identity. (-1 instead at Heat 4+.)",
+    "Who?: Add +1 when you Face Danger by changing into your fake identity without anybody seeing.",
+    "Big reveal: You may reveal your identity with a flourish. This only works once per witness. Add +3 to your next roll involving those who saw it."
+   ]
+  },
+  {
+   "id": "ss/vigilante",
+   "cat": "Path",
+   "name": "Vigilante",
+   "fields": [],
+   "meters": {},
+   "requirement": "",
+   "note": "",
+   "abilities": [
+    "You listen to police radio chatter. When you do this to Gather Information, add +1 and take +1 momentum on a hit.",
+    "Your belief drives you. Take +1 momentum when you score a hit on a move against those who've committed crimes.",
+    "Some on the force believe in what you do. When you Compel police or other authorities, add +1 and take +1 momentum on a hit. (Doesn't work at Heat 2+.)"
+   ]
+  },
+  {
+   "id": "ss/journalist",
+   "cat": "Path",
+   "name": "Journalist",
+   "fields": [],
+   "meters": {},
+   "requirement": "",
+   "note": "",
+   "abilities": [
+    "Find a lead: When working on a story, add +1 to Compel and Gather Information rolls related to it.",
+    "I know someone who knows someone: When you need a lead, roll +heart and take +1 momentum on a hit. On a strong hit, you know an NPC who knows something and owes you. On a weak hit, they know something but despise you. On a miss, your digging brings up trouble. Pay the Price.",
+    "The truth is out there: When you Fulfill Your Vow on a vow that involves exposing the truth, you may reroll the challenge dice if you expose yourself to danger. If you do, start a tension clock as an organization or foe begins to hunt you down."
+   ]
+  },
+  {
+   "id": "ss/code_of_honor",
+   "cat": "Path",
+   "name": "Code of Honor",
+   "fields": [
+    "code"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "If you break your Code, immediately Endure Stress (-3) and mark Shaken.",
+   "abilities": [
+    "When your Code makes your life more difficult (refusing to use guns in a gunfight, refusing to kill an adversary who is sure to turn up later), take +1 momentum.",
+    "When you Face Desolation, add +1 and take +1 momentum on a hit as your Code strengthens your spirit.",
+    "If you no longer believe in your Code, you may forsake it. Lose this asset, take a new Path and get its second ability for free."
+   ]
+  },
+  {
+   "id": "ss/bloodthirsty",
+   "cat": "Path",
+   "name": "Bloodthirsty",
+   "fields": [],
+   "meters": {},
+   "requirement": "",
+   "note": "",
+   "abilities": [
+    "When you mark progress by wounding your enemies, take +1 momentum. Take +1 Heat.",
+    "When you Compel using a show of violence to intimidate, add +1 and take +1 momentum on a hit.",
+    "When you Take Decisive Action by brutally wounding or killing an enemy, you may burn momentum to cancel one challenge die if your momentum is greater. Endure Stress (-2) and take +2 Heat."
+   ]
+  },
+  {
+   "id": "ss/employed",
+   "cat": "Path",
+   "name": "Employed",
+   "fields": [
+    "organization"
+   ],
+   "meters": {
+    "obligation": {
+     "max": 5,
+     "label": "obligation"
+    }
+   },
+   "requirement": "",
+   "note": "When the track hits +5, you cannot use this asset until you do a difficult, dangerous, unusual or dishonorable task the organization asks. Then reset to 0.",
+   "abilities": [
+    "Your organization has resources and contacts. Add +1 to Gather Information when you use its networks or resources. If you do, +1 on this asset's track.",
+    "Your organization can provide recovery help. Add +1 to Heal and Resupply when you use it. If you do, +1 on the track.",
+    "Your organization can send backup. When facing a foe, call them in to reduce the foe's rank by one. Envision the backup. If you do, +3 on the track."
+   ]
+  },
+  {
+   "id": "ss/independent",
+   "cat": "Path",
+   "name": "Independent",
+   "fields": [],
+   "meters": {},
+   "requirement": "",
+   "note": "",
+   "abilities": [
+    "Isolation: When you Hearten in isolation, add +1 and take +1 momentum on a hit.",
+    "I work alone: When you Swear an Iron Vow to do something on your own, you may reroll any dice.",
+    "Lone wolf: When you face more than one opponent in combat, add +1 to your rolls."
+   ]
+  },
+  {
+   "id": "ss/power_gadgeteer",
+   "cat": "Power",
+   "name": "Gadgeteer",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "Requires the Kit module. Technology source.",
+   "note": "",
+   "abilities": [
+    "Utility belt: Your Kit track goes to +5. When you Resupply at your HQ, you may put Resources into Kit one for one.",
+    "Built for this: Once per session, envision a gadget you made for exactly this situation. Spend 2 Kit and take an automatic strong hit on the move it helps with.",
+    "Tinker: When you Repair or build gear at your HQ, add +1. On a hit, also take +1 Kit."
+   ]
+  },
+  {
+   "id": "ss/power_healing_factor",
+   "cat": "Power",
+   "name": "Healing Factor (street)",
+   "fields": [
+    "source",
+    "cost"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "",
+   "abilities": [
+    "Fast mender: When you Heal yourself or are healed, add +1. On a hit, take +1 more health.",
+    "Shake it off: Once per scene, when you Endure Harm, you may roll +iron instead of +health.",
+    "Not today: The first time you would die on Face Death, you survive with 0 health and are out of action until the next session. Then cross out this ability."
+   ]
+  },
+  {
+   "id": "ss/power_super_strength",
+   "cat": "Power",
+   "name": "Super-Strength (street)",
+   "fields": [
+    "source",
+    "cost"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "Peak human: bend bars, force doors, hold a car up for a few seconds.",
+   "abilities": [
+    "Strong like an ox: When you use your strength to Face Danger, add +1 and take +1 momentum on a hit.",
+    "Hits like a brick: When you Strike or Clash bare-handed, add +1 and take +1 momentum on a hit.",
+    "Hold the line: When you Endure Harm while shielding someone, add +1."
+   ]
+  },
+  {
+   "id": "ss/power_toughness",
+   "cat": "Power",
+   "name": "Toughness (street)",
+   "fields": [
+    "source",
+    "cost"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "",
+   "abilities": [
+    "Tough: Your max health is 6.",
+    "I can take it: When you Endure Harm and score a hit, take +1 momentum.",
+    "Won't stay down: Once per session, when harm would put you out of action, stay on your feet with 1 health."
+   ]
+  },
+  {
+   "id": "ss/power_enhanced_senses",
+   "cat": "Power",
+   "name": "Enhanced Senses (street)",
+   "fields": [
+    "source",
+    "sense"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "Loud noise, bright light or strong smells can overwhelm you.",
+   "abilities": [
+    "Keen: When your sense helps you Gather Information or Work the Case, add +1 and take +1 momentum on a hit.",
+    "Nothing gets past you: When someone tries to ambush you, add +1 to Enter the Fray or React Under Fire.",
+    "On the trail: You can follow someone across the city by scent, sound or sight. Face Danger +wits; on a hit, you find them."
+   ]
+  },
+  {
+   "id": "ss/power_danger_sense",
+   "cat": "Power",
+   "name": "Danger Sense",
+   "fields": [
+    "source",
+    "cost"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "",
+   "abilities": [
+    "Uh oh: Add +1 when you Face Danger to avoid a threat and take +1 momentum on a hit.",
+    "See it coming: Add +1 when you React Under Fire or Clash and take +1 momentum on a hit.",
+    "See the future: You may roll twice when you Pay the Price and choose your preferred option."
+   ]
+  },
+  {
+   "id": "ss/power_special_weapon",
+   "cat": "Power",
+   "name": "Special Weapon(s)",
+   "fields": [
+    "source",
+    "weapon"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "",
+   "abilities": [
+    "That ain't a knife: When you Enter the Fray by revealing this weapon, add +1 and take +1 momentum on a hit.",
+    "How's it feel?: When you Strike with this weapon, choose one: make them scared (add +1 and take +1 momentum on a hit) or make it hurt (mark progress).",
+    "This is a knife: When you Take Decisive Action with your weapon, you may Endure Harm (-2) to reroll one challenge die."
+   ]
+  },
+  {
+   "id": "ss/power_super_speed",
+   "cat": "Power",
+   "name": "Super-Speed (minor)",
+   "fields": [
+    "source",
+    "cost"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "",
+   "abilities": [
+    "Fast: When you use your speed to Face Danger, add +1 and take +1 momentum on a hit.",
+    "Watch me: When you use your speed in combat, add +1 and take +1 momentum on a hit.",
+    "Journeyman: When you use your speed to Undertake an Expedition, you may mark progress even on a miss. This tires you out, and you must rest before using Super-Speed again."
+   ]
+  },
+  {
+   "id": "ss/power_tendrils",
+   "cat": "Power",
+   "name": "Tendrils/Tentacles (tech)",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "",
+   "abilities": [
+    "Movement: You can sling yourself around if the environment permits. Add +1 when the tendrils assist a non-combat move and take +1 momentum on a hit.",
+    "Combat: You can hit, grab, squeeze and throw with your tendrils. Add +1 to a combat move and take +1 momentum on a hit.",
+    "Multi-tasking: You may perform two moves at once. Take -1 and make one Face Danger roll. You gain the benefits and take the consequences of each move."
+   ]
+  },
+  {
+   "id": "ss/power_electrical",
+   "cat": "Power",
+   "name": "Electrical Aptitude (tech)",
+   "fields": [
+    "source"
+   ],
+   "meters": {
+    "battery": {
+     "max": 5,
+     "label": "battery"
+    }
+   },
+   "requirement": "",
+   "note": "",
+   "abilities": [
+    "Spark: You store electricity. When you expose yourself to it, +1 battery. When you use electricity to aid a non-combat move, add +1 and take +1 momentum on a hit, then -1 battery. Battery max +1.",
+    "Surge: You may Face Danger (+iron) by exposing yourself to high voltage. On a strong hit, +3 battery. On a weak hit, as above but Endure Harm (-2). You may now spend x battery to add +x to a move. Battery max +3.",
+    "Strike: Use stored electricity in combat: add x to your roll and take +1 momentum on a hit, then -x battery. Battery max +5."
+   ]
+  },
+  {
+   "id": "ss/power_super_pet",
+   "cat": "Companion",
+   "name": "Super-Pet",
+   "fields": [
+    "source",
+    "name"
+   ],
+   "meters": {
+    "health": {
+     "max": 4,
+     "label": "health"
+    }
+   },
+   "requirement": "",
+   "note": "",
+   "abilities": [
+    "If your pet uses its powers to aid you when you Face Danger, add +1 and take +1 momentum on a hit. On a miss, your Companion Takes a Hit. Max health 3.",
+    "If your pet aids you in battle, add +1 to a combat move and take +1 momentum on a hit. On a miss, your Companion Takes a Hit.",
+    "Your pet has a max health of 4."
+   ]
+  },
+  {
+   "id": "ss/power_custom",
+   "cat": "Power",
+   "name": "Custom Power",
+   "fields": [
+    "name",
+    "source",
+    "cost"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "",
+   "abilities": [
+    "When you use this power to Face Danger or Secure an Advantage, add +1 and take +1 momentum on a hit.",
+    "You can use this power in combat. When you do, add +1 to a combat move and take +1 momentum on a hit.",
+    "Write your own: how the power helps with other moves (recovery, suffer, patrol), or a bonus on a strong hit with a match."
+   ]
+  }
+ ],
+ "sources": [
+  {
+   "name": "Training",
+   "text": "Physical, mental or mystical training. What did you sacrifice? Who trained you? Where?"
+  },
+  {
+   "name": "Technology",
+   "text": "Advanced tech: a suit, a tool, nanites. Did you build it, find it, or get given it? Can others use it?"
+  },
+  {
+   "name": "Mutation",
+   "text": "An accident changed you. What happened? Is it visible? Who else knows? (One power, with a cost.)"
+  },
+  {
+   "name": "Alien",
+   "text": "You come from elsewhere. How do you hide it? Who is looking for you? (One power, with a cost.)"
+  },
+  {
+   "name": "Animal",
+   "text": "A bite, a bond or an experiment tied you to an animal. (One power, with a cost.)"
+  },
+  {
+   "name": "Supernatural",
+   "text": "A bargain, a curse or a relic. What did it cost you? (One power, with a cost.)"
+  }
+ ],
+ "sfAllowedAssets": [
+  "sf/path/ace",
+  "sf/path/archer",
+  "sf/path/armored",
+  "sf/path/augmented",
+  "sf/path/bannersworn",
+  "sf/path/blademaster",
+  "sf/path/brawler",
+  "sf/path/devotant",
+  "sf/path/diplomat",
+  "sf/path/empath",
+  "sf/path/explorer",
+  "sf/path/fugitive",
+  "sf/path/gearhead",
+  "sf/path/gunslinger",
+  "sf/path/gunner",
+  "sf/path/haunted",
+  "sf/path/healer",
+  "sf/path/infiltrator",
+  "sf/path/leader",
+  "sf/path/lore_hunter",
+  "sf/path/loyalist",
+  "sf/path/outcast",
+  "sf/path/scavenger",
+  "sf/path/scoundrel",
+  "sf/path/slayer",
+  "sf/path/sleuth",
+  "sf/path/sniper",
+  "sf/path/vestige",
+  "sf/path/veteran",
+  "sf/path/weapon_master",
+  "sf/path/demolitionist",
+  "sf/path/artist",
+  "sf/companion/combat_bot",
+  "sf/companion/glowcat",
+  "sf/companion/rockhorn",
+  "sf/companion/sidekick",
+  "sf/companion/survey_bot",
+  "sf/companion/utility_bot",
+  "sf/module/medbay",
+  "sf/module/research_lab",
+  "sf/module/workshop",
+  "sf/deed/bonded",
+  "sf/deed/homesteader",
+  "sf/deed/marked",
+  "sf/deed/oathbreaker",
+  "sf/deed/revenant",
+  "sf/deed/survivor",
+  "sf/deed/vanguard"
+ ]
+}
