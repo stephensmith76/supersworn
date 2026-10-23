@@ -112,6 +112,42 @@ function input(path, value, { placeholder = '', cls = '', area = false } = {}) {
     : `<input class="${cls}" data-bind="${p}" value="${esc(value)}" placeholder="${esc(placeholder)}">`;
 }
 
+function portrait(path, value, label) {
+  const p = esc(JSON.stringify(path));
+  return `<div class="portrait">
+    ${value ? `<button class="pic" data-act="viewPic" data-path='${p}' aria-label="View ${esc(label)} larger"><img src="${esc(value)}" alt="${esc(label)}"></button>` : `<div class="pic empty" aria-hidden="true">?</div>`}
+    <div class="picbtns">
+      <label class="btn sm">${value ? 'Change picture' : 'Add picture'}<input type="file" accept="image/*" data-portrait='${p}' hidden></label>
+      ${value ? `<button class="btn sm danger" data-act="del" data-path='${p}'>Remove</button>` : ''}
+    </div>
+  </div>`;
+}
+
+// Shrink a photo to at most 360px on its long side as a JPEG, so it stays small enough to save and sync.
+function shrinkImage(file, max = 360) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const im = new Image();
+    im.onload = () => {
+      const k = Math.min(1, max / Math.max(im.width, im.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      resolve(c.toDataURL('image/jpeg', 0.8));
+    };
+    im.onerror = () => { URL.revokeObjectURL(url); reject(new Error('That file is not a picture the phone can read.')); };
+    im.src = url;
+  });
+}
+
+function toast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast'; t.setAttribute('role', 'status'); t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
 function log(text, kind = 'note') {
   const e = { id: uid(), created: Date.now(), author: me(), kind, text };
   store.set(['journal', e.id], e);
@@ -130,7 +166,7 @@ function viewHeroes() {
   let out = `<section class="card shared">
     <div class="row between"><h3>Shared</h3>${stepper(['shared', 'resources'], S().shared.resources, { label: 'Resources' })}</div>
   </section>
-  <div class="chips">${hs.map(x => `<button class="chip ${h && x.id === h.id ? 'on' : ''}" data-act="pickHero" data-id="${x.id}">${esc(x.name || 'Unnamed')}</button>`).join('')}
+  <div class="chips">${hs.map(x => `<button class="chip ${h && x.id === h.id ? 'on' : ''}" data-act="pickHero" data-id="${x.id}">${x.portrait ? `<img class="face" src="${esc(x.portrait)}" alt="">` : ''}${esc(x.name || 'Unnamed')}</button>`).join('')}
     <button class="chip add" data-act="openCreate">+ Hero</button></div>`;
   if (!h) return out + `<section class="card"><p>No heroes yet.</p><button class="btn accent" data-act="openCreate">Create a hero</button>
     <p class="hint">Joining your partner's game instead? Open settings (gear icon).</p></section>`;
@@ -138,6 +174,7 @@ function viewHeroes() {
   const lim = momentumLimits(h);
   const xpEarned = Object.values(h.legacies).reduce((a, t) => a + boxes(t) * 2, 0);
   out += `<section class="card">
+    ${portrait(P('portrait'), h.portrait, h.name || 'hero')}
     ${input(P('name'), h.name, { placeholder: 'Hero name', cls: 'title-in' })}
     ${input(P('identity'), h.identity, { placeholder: 'Who they are by day' })}
     <h4>Stats <small>array 3, 2, 2, 1, 1</small></h4>
@@ -246,6 +283,7 @@ function viewTracks() {
     ${nems.map(n => {
       const p = ['nemeses', n.id];
       return `<div class="nemesis ${n.status}">
+        ${portrait(p.concat('portrait'), n.portrait, n.name || 'villain')}
         ${input(p.concat('name'), n.name, { placeholder: 'Nemesis name', cls: 'name-in' })}
         ${input(p.concat('gimmick'), n.gimmick, { placeholder: 'Gimmick: what they do and how' })}
         <div class="row wrap">
@@ -500,7 +538,9 @@ function viewSettings() {
 
 // ---------- render ----------
 const VIEWS = { heroes: viewHeroes, tracks: viewTracks, roll: viewRoll, oracles: viewOracles, journal: viewJournal, ask: viewAsk };
-const MODALS = { assets: viewAssetPicker, settings: viewSettings, villain: viewVillain, create: viewCreate, campaigns: viewCampaigns, begin: viewBegin, end: viewEnd };
+const viewPic = () => `<div class="modal-head"><h3>Picture</h3><button class="btn sm" data-act="closePic">Close</button></div>
+  ${ui.pic ? `<img class="bigpic" src="${esc(ui.pic)}" alt="">` : ''}`;
+const MODALS = { pic: viewPic, assets: viewAssetPicker, settings: viewSettings, villain: viewVillain, create: viewCreate, campaigns: viewCampaigns, begin: viewBegin, end: viewEnd };
 const $view = () => document.getElementById('view');
 
 function render() {
@@ -820,6 +860,8 @@ const actions = {
     ui.recapDraft = ''; ui.endDone.recap = true; render();
   },
   fx(el) { applyFx(el); },
+  viewPic(el) { ui.pic = store.get(JSON.parse(el.dataset.path)); ui.modalBefore = ui.modal; ui.modal = 'pic'; render(); },
+  closePic() { ui.modal = ui.modalBefore || null; ui.pic = null; render(); },
   diceMode(el) { store.setPref('physical', el.dataset.v); ui.manual = {}; render(); },
   pickDie(el) { const k = el.dataset.k, v = +el.dataset.v; ui.manual[k] = ui.manual[k] === v ? null : v; render(); },
   export() {
@@ -1289,6 +1331,11 @@ function wire() {
       if (el.dataset.ui === 'rollHero') { ui.heroId = el.value; }
       if (el.dataset.ui === 'moveId') { const m = D.moveById[el.value]; if (m && m.stats.length) ui.rollStat = m.stats[0]; }
       saveUi(); render();
+      return;
+    }
+    if (el.dataset.portrait && el.files && el.files[0]) {
+      const path = JSON.parse(el.dataset.portrait);
+      shrinkImage(el.files[0]).then(url => store.set(path, url)).catch(err => toast(err.message));
       return;
     }
     if (el.id === 'importfile' && el.files[0]) {

@@ -32,6 +32,9 @@ const num = (v, d, lo, hi) => {
 const str = (v, max = 4000) => (v == null ? '' : String(v).slice(0, max));
 const oneOf = (v, list, d) => (list.includes(v) ? v : d);
 const isObj = v => v != null && typeof v === 'object' && !Array.isArray(v);
+// Pictures are small JPEG/PNG data URLs made on the device. Anything else is dropped.
+const IMG = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+=*$/;
+const img = v => (typeof v === 'string' && v.length <= 400000 && IMG.test(v) ? v : '');
 
 function map(m, fn, keyRe = ID) {
   const out = {};
@@ -58,7 +61,7 @@ const cleanAsset = entity((a, k) => ({
 
 const cleanHero = entity((h, k) => ({
   id: k, created: created(h),
-  name: str(h.name, 80), look: str(h.look, 400), identity: str(h.identity, 200), notes: str(h.notes, 8000),
+  name: str(h.name, 80), look: str(h.look, 400), identity: str(h.identity, 200), notes: str(h.notes, 8000), portrait: img(h.portrait),
   stats: Object.fromEntries(['edge', 'heart', 'iron', 'shadow', 'wits'].map(s => [s, num((h.stats || {})[s], 0, -2, 6)])),
   health: num(h.health, 5, 0, 6), spirit: num(h.spirit, 5, 0, 5), momentum: num(h.momentum, 2, -6, 10), heat: num(h.heat, 0, 0, 5),
   impacts: map(h.impacts, v => !!v, LABEL_KEY),
@@ -79,7 +82,7 @@ const cleanClock = entity((c, k) => ({
 }));
 
 const cleanNemesis = entity((n, k) => ({
-  id: k, created: created(n), name: str(n.name, 80), gimmick: str(n.gimmick, 400), scheme: str(n.scheme, 300), sheet: str(n.sheet, 4000),
+  id: k, created: created(n), name: str(n.name, 80), gimmick: str(n.gimmick, 400), scheme: str(n.scheme, 300), sheet: str(n.sheet, 4000), portrait: img(n.portrait),
   rank: oneOf(n.rank, RANKS, 'extreme'), status: oneOf(n.status, ['large', 'locked', 'retired'], 'large'),
   segments: oneOf(Number(n.segments), [4, 6, 8, 10], 8), filled: num(n.filled, 0, 0, 10),
 }));

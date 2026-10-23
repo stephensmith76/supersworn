@@ -253,3 +253,13 @@ input, select, textarea, .field input, .form select { font-size: 16px; }
 .die.on { background: var(--text); color: var(--bg); border-color: var(--text); }
 .d100 input { max-width: 140px; }
 .chip:disabled { opacity: .4; }
+/* pictures */
+.portrait { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.pic { width: 88px; height: 88px; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: var(--bg); padding: 0; flex: none; cursor: pointer; }
+.pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pic.empty { display: grid; place-items: center; font: 36px/1 var(--display); color: var(--line); cursor: default; }
+.picbtns { display: flex; flex-wrap: wrap; gap: 6px; }
+.nemesis .pic { width: 72px; height: 72px; }
+.face { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; vertical-align: middle; margin: -4px 6px -4px -6px; }
+.bigpic { width: 100%; border-radius: var(--radius); border: 1px solid var(--line); }
+.toast { position: fixed; left: 16px; right: 16px; bottom: calc(70px + env(safe-area-inset-bottom)); background: var(--surface2); border: 1px solid var(--miss); color: var(--text); padding: 12px; border-radius: 10px; z-index: 10; }

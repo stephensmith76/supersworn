@@ -1,6 +1,6 @@
 // Offline cache. Bump VERSION when app files change so old caches are cleared.
 const PREFIX = 'ss-';
-const VERSION = PREFIX + 'v6';
+const VERSION = PREFIX + 'v7';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'css/styles.css',
   'js/app.js', 'js/store.js', 'js/rules.js', 'js/sync.js', 'js/ai.js', 'js/effects.js',

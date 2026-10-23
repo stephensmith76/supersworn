@@ -5,6 +5,7 @@ The app has six tabs along the bottom (Heroes, Tracks, Roll, Oracles, Journal, H
 ## Heroes tab
 - Shared card at the top: the shared Resources meter (replaces supply). Tap + or − to change it.
 - Hero chips: tap a name to switch heroes. "+ Hero" opens the character creation walkthrough: pick one of seven archetypes (Masked brawler, Ex-cop gone rogue, Hacker in a van, Reformed thief, Night-shift medic, Reporter with a mask, Occult detective) or build your own, name the hero, assign stats 3, 2, 2, 1, 1 with the menus, choose a Power and Source, a Path and one more asset (HQ is added automatically), and write an Epic background vow plus an optional current vow. "Create hero" adds the hero, their assets and their vow tracks. "Skip and make a blank hero instead" makes an empty sheet.
+- Picture: "Add picture" at the top of the hero sheet opens the phone's camera or gallery. The picture is shrunk to a small size, saved with the hero and synced. Tap it to see it larger, "Change picture" to replace it, "Remove" to delete it. The picture also shows on the hero's name chip. Nemeses have the same picture spot on the Tracks tab.
 - Name and "Who they are by day" fields: type, then tap elsewhere to save.
 - Stats: + and − on each of edge, heart, iron, shadow, wits.
 - Meters: tap a square to set Health, Spirit or Heat to that value (tap the highest filled square again to lower it by one). Momentum uses + and −, and "Reset" sets it to the reset value. The max and reset values update automatically from marked impacts.
