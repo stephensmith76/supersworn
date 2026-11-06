@@ -88,6 +88,7 @@ const cleanNemesis = entity((n, k) => ({
   id: k, created: created(n), name: str(n.name, 80), gimmick: str(n.gimmick, 400), scheme: str(n.scheme, 300), sheet: str(n.sheet, 4000), portrait: img(n.portrait),
   rank: oneOf(n.rank, RANKS, 'extreme'), status: oneOf(n.status, ['large', 'locked', 'retired'], 'large'),
   segments: oneOf(Number(n.segments), [4, 6, 8, 10], 8), filled: num(n.filled, 0, 0, 10),
+  assets: map(n.assets, cleanAsset),
 }));
 
 const cleanFeedback = entity((f, k) => ({

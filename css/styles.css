@@ -289,3 +289,9 @@ a.btn.accent { color: var(--accent-ink); }
 .clues .cluebody input { width: 100%; }
 .clues li { align-items: flex-start; }
 .cluebtns .btn.sm { min-width: 40px; }
+/* card badges */
+.tag.t-strange { color: #b48ae8; border-color: #b48ae8; }
+.tag.t-villain { color: var(--miss); border-color: var(--miss); }
+.tag.t-original { color: var(--muted); border-color: var(--muted); }
+.tag.t-starforged { color: #7aa7d9; border-color: #7aa7d9; }
+.nemesis .asset { margin-left: 4px; }

@@ -32,7 +32,13 @@ async function loadData() {
   D.moves = ss.moves.concat(sf.moves.map(m => ({ ...m, text: resup(m.text), stats: m.stats.map(s => (s === 'supply' ? 'resources' : s)) })));
   D.oracles = ss.oracles.concat(sf.oracles);
   const allowed = new Set(ss.sfAllowedAssets);
-  D.assets = ss.assets.concat(sf.assets.filter(a => allowed.has(a.id)).map(a => ({ ...a, abilities: a.abilities.map(resup) })));
+  const sfAssets = sf.assets.map(a => ({ ...a, abilities: a.abilities.map(resup), tag: allowed.has(a.id) ? 'street' : 'starforged' }));
+  const sfById = Object.fromEntries(sfAssets.map(a => [a.id, a]));
+  for (const a of ss.assets) {
+    const src = a.sameAs && sfById[a.sameAs];
+    if (src) { a.abilities = src.abilities; a.meters = { ...src.meters, ...a.meters }; a.requirement = a.requirement || src.requirement; }
+  }
+  D.assets = ss.assets.concat(sfAssets);
   for (const o of D.oracles) D.oracleById[o.id] = o;
   for (const a of D.assets) D.assetById[a.id] = a;
   for (const m of D.moves) D.moveById[m.id] = m;
@@ -202,7 +208,7 @@ function viewHeroes() {
   </section>
   <section class="card">
     <div class="row between"><h4>Assets</h4><button class="btn sm" data-act="openAssets">+ Asset</button></div>
-    ${sorted(h.assets).map(inst => assetCard(h, inst)).join('') || '<p class="empty">Start with HQ, one Power with a Source, one Path, and one more.</p>'}
+    ${sorted(h.assets).map(inst => assetCard(['heroes', h.id], inst)).join('') || '<p class="empty">Start with HQ, one Power with a Source, one Path, and one more.</p>'}
   </section>
   <section class="card">
     <h4>Notes</h4>
@@ -212,12 +218,20 @@ function viewHeroes() {
   return out;
 }
 
-function assetCard(h, inst) {
+const TAGS = {
+  street: ['Street', 'Fits street-level heroes'],
+  strange: ['Strange', 'One per hero, from a non-Training, non-Technology source, with a cost'],
+  villain: ['Villain only', 'Villain-only under the power ceiling'],
+  original: ['Original', 'Replaced by a street version for heroes'],
+  starforged: ['Starforged', 'Starforged card that is not part of street-level play'],
+};
+const tagBadge = a => (a.tag && a.tag !== 'street' ? `<span class="tag t-${esc(a.tag)}" title="${esc(TAGS[a.tag][1])}">${esc(TAGS[a.tag][0])}</span>` : '');
+function assetCard(owner, inst) {
   const a = D.assetById[inst.ref];
   if (!a) return '';
-  const base = ['heroes', h.id, 'assets', inst.id];
+  const base = owner.concat(['assets', inst.id]);
   return `<details class="asset" data-key="asset-${esc(inst.id)}">
-    <summary><span class="cat">${esc(a.cat)}</span> ${esc(a.name)}${inst.fields && Object.values(inst.fields).find(Boolean) ? ` <small>${esc(Object.values(inst.fields).filter(Boolean).join(', '))}</small>` : ''}</summary>
+    <summary><span class="cat">${esc(a.cat)}</span> ${esc(a.name)} ${tagBadge(a)}${inst.fields && Object.values(inst.fields).find(Boolean) ? ` <small>${esc(Object.values(inst.fields).filter(Boolean).join(', '))}</small>` : ''}</summary>
     ${a.requirement ? `<p class="req">${esc(a.requirement)}</p>` : ''}
     ${a.note ? `<p class="req">${esc(a.note)}</p>` : ''}
     ${a.fields.map(f => `<label class="field">${esc(f)} ${input(base.concat(['fields', f]), (inst.fields || {})[f] || '')}</label>`).join('')}
@@ -227,19 +241,26 @@ function assetCard(h, inst) {
   </details>`;
 }
 
+const ASSET_FILTERS = [['all', 'All'], ['street', 'Street-level'], ['strange', 'Strange powers'], ['villain', 'Villain only'], ['original', 'Originals'], ['starforged', 'Starforged extras']];
 function viewAssetPicker() {
   const q = ui.assetQuery.toLowerCase();
+  const f = ui.assetFilter || 'all';
   const groups = {};
+  const target = ui.assetTarget || [];
+  const owner = target[0] === 'nemeses' ? (S().nemeses[target[1]] || {}).name || 'this Nemesis' : (S().heroes[target[1]] || {}).name || 'this hero';
   for (const a of D.assets) {
-    if (q && !(a.name + ' ' + a.abilities.join(' ')).toLowerCase().includes(q)) continue;
+    if (f !== 'all' && (a.tag || 'street') !== f) continue;
+    if (q && !(a.name + ' ' + a.abilities.join(' ') + ' ' + (a.note || '')).toLowerCase().includes(q)) continue;
     (groups[a.cat] = groups[a.cat] || []).push(a);
   }
   const order = ['Headquarters', 'Power', 'Path', 'Module', 'Companion', 'Deed'];
-  return `<div class="modal-head"><h3>Add asset</h3><button class="btn sm" data-act="closeModal">Close</button></div>
-    <input class="search" data-ui="assetQuery" value="${esc(ui.assetQuery)}" placeholder="Search assets">
+  return `<div class="modal-head"><h3>Add a card to ${esc(owner)}</h3><button class="btn sm" data-act="closeModal">Close</button></div>
+    <input class="search" data-ui="assetQuery" value="${esc(ui.assetQuery)}" placeholder="Search cards">
+    <div class="chips">${ASSET_FILTERS.map(([k, l]) => `<button class="chip ${k === f ? 'on' : ''}" data-act="assetFilter" data-v="${k}">${l}</button>`).join('')}</div>
     <p class="hint">Sources: ${D.sources.map(s => `<b>${esc(s.name)}</b>`).join(', ')}. Anything but Training or Technology allows one power, with a cost.</p>
-    ${order.filter(c => groups[c]).map(c => `<h4>${c}</h4>${groups[c].map(a => `<details class="asset pick" data-key="pick-${esc(a.id)}"><summary>${esc(a.name)} ${a.id.startsWith('ss/') ? '<span class="tag">Supersworn</span>' : ''}</summary>
-      ${a.requirement ? `<p class="req">${esc(a.requirement)}</p>` : ''}<ol class="abilities">${a.abilities.map(t => `<li>${md(t)}</li>`).join('')}</ol>
+    ${Object.keys(groups).length ? '' : '<p class="empty">No cards match.</p>'}
+    ${order.concat(Object.keys(groups).filter(c => !order.includes(c))).filter(c => groups[c]).map(c => `<h4>${c}</h4>${groups[c].map(a => `<details class="asset pick" data-key="pick-${esc(a.id)}"><summary>${esc(a.name)} ${a.id.startsWith('ss/') ? '<span class="tag">Supersworn</span>' : ''} ${tagBadge(a)}</summary>
+      ${a.requirement ? `<p class="req">${esc(a.requirement)}</p>` : ''}${a.note ? `<p class="req">${esc(a.note)}</p>` : ''}<ol class="abilities">${a.abilities.map(t => `<li>${md(t)}</li>`).join('')}</ol>
       <button class="btn" data-act="addAsset" data-ref="${a.id}">Add ${esc(a.name)}</button></details>`).join('')}`).join('')}`;
 }
 
@@ -375,6 +396,9 @@ function viewTracks() {
           <select data-bind='${esc(JSON.stringify(p.concat('status')))}'><option value="large" ${n.status === 'large' ? 'selected' : ''}>At large</option><option value="locked" ${n.status === 'locked' ? 'selected' : ''}>Locked up</option><option value="retired" ${n.status === 'retired' ? 'selected' : ''}>Retired</option></select>
         </div>
         ${clockBlock(p, n, 'Scheme', true)}
+        <details class="sheet" data-key="nemcards-${esc(n.id)}"><summary>Powers and cards (${Object.keys(n.assets || {}).length})</summary>
+          ${sorted(n.assets).map(inst => assetCard(p, inst)).join('')}
+          <button class="btn sm" data-act="openAssets" data-nemesis="${esc(n.id)}">+ Card</button></details>
         <details class="sheet" data-key="sheet-${esc(n.id)}"><summary>Villain sheet</summary>${input(p.concat('sheet'), n.sheet || '', { area: true, placeholder: 'Motive, edge, method, weakness, lair, muscle, look, calling card' })}</details>
         <div class="row wrap">
           ${n.status === 'large' ? `<button class="btn sm" data-act="lockUp" data-id="${n.id}">Lock up</button>` : ''}
@@ -832,15 +856,25 @@ const actions = {
   addHero() { const h = blankHero(); h.stats = { edge: 0, heart: 0, iron: 0, shadow: 0, wits: 0 }; store.set(['heroes', h.id], h); ui.heroId = h.id; ui.rollHero = h.id; saveUi(); render(); },
   delHero(el) { if (confirmTwice(el)) { store.set(['heroes', el.dataset.id], null); ui.heroId = null; render(); } },
   resetMomentum(el) { const h = S().heroes[el.dataset.id]; store.set(['heroes', h.id, 'momentum'], momentumLimits(h).reset); },
-  openAssets() { ui.modal = 'assets'; ui.assetQuery = ''; render(); $view().scrollTop = 0; },
+  openAssets(el) {
+    const h = currentHero();
+    ui.assetTarget = el && el.dataset.nemesis ? ['nemeses', el.dataset.nemesis] : h ? ['heroes', h.id] : null;
+    if (!ui.assetTarget) return;
+    ui.assetFilter = el && el.dataset.nemesis ? 'all' : (ui.assetFilter || 'all');
+    ui.modal = 'assets'; ui.assetQuery = ''; render(); $view().scrollTop = 0;
+  },
+  assetFilter(el) { ui.assetFilter = el.dataset.v; render(); },
   closeModal() { ui.modal = null; render(); },
   addAsset(el) {
-    const h = currentHero();
+    const target = ui.assetTarget;
     const a = D.assetById[el.dataset.ref];
+    if (!target || !a || !store.get(target)) return;
     const inst = { id: uid(), created: Date.now(), ref: a.id, enabled: { a0: true }, fields: {}, meters: {} };
     for (const [k, m] of Object.entries(a.meters || {})) inst.meters[k] = k === 'health' || k === 'integrity' ? m.max : 0;
-    store.set(['heroes', h.id, 'assets', inst.id], inst);
-    ui.modal = null; render();
+    store.set(target.concat(['assets', inst.id]), inst);
+    ui.modal = null;
+    if (target[0] === 'nemeses') { ui.tab = 'tracks'; saveUi(); }
+    render();
   },
   delAsset(el) { if (confirmTwice(el)) store.set(JSON.parse(el.dataset.path), null); },
   del(el) { if (confirmTwice(el)) store.set(JSON.parse(el.dataset.path), null); },
@@ -1081,7 +1115,7 @@ function buildContext() {
   const tracks = sorted(s.tracks).filter(t => !t.done).map(t => t.type === 'case'
     ? `- Case "${t.name || '(unnamed)'}": complexity ${COMPLEXITY[t.rank]}. Clues: ${activeClues(t).map(c => c.text || c.prompt).join(' | ') || 'none'}. Suspects: ${sorted(t.suspects).map(x => x.text || x.prompt).join(' | ') || 'none'}${caseLocked(t) ? '. Locked: last theory failed, needs a new clue.' : ''}`
     : `- ${t.name || '(unnamed)'}: ${t.rank} ${t.type}, ${boxes(t.ticks)} boxes (${t.ticks} ticks)`).join('\n');
-  const nems = sorted(s.nemeses).map(n => `- ${n.name || '(unnamed)'}: ${n.rank}, ${n.status}, scheme "${n.scheme}" ${n.filled}/${n.segments}. ${n.gimmick}`).join('\n');
+  const nems = sorted(s.nemeses).map(n => `- ${n.name || '(unnamed)'}: ${n.rank}, ${n.status}, scheme "${n.scheme}" ${n.filled}/${n.segments}. ${n.gimmick}${Object.keys(n.assets || {}).length ? ' Cards: ' + sorted(n.assets).map(x => (D.assetById[x.ref] || {}).name).filter(Boolean).join(', ') + '.' : ''}`).join('\n');
   const recent = sorted(s.journal).slice(-6).map(e => `- ${e.text.replace(/\n/g, ' ')}`).join('\n');
   const state = `## Current game\nShared Resources: ${s.shared.resources}\n\nHeroes:\n${heroLines || 'none'}\n\nOpen tracks:\n${tracks || 'none'}\n\nNemeses:\n${nems || 'none'}\n\nRecent journal:\n${recent || 'none'}`;
   return { rules: rulesText, state };
@@ -1329,7 +1363,7 @@ function statsValid(st) {
 
 function viewCreate() {
   const w = ui.cw || (ui.cw = newWizard());
-  const assetsOf = cats => D.assets.filter(a => cats.includes(a.cat));
+  const assetsOf = cats => D.assets.filter(a => cats.includes(a.cat) && ['street', 'strange'].includes(a.tag || 'street'));
   const opt = (list, cur, blank = '(choose)') => `<option value="">${blank}</option>` + list.map(a => `<option value="${esc(a.id)}" ${a.id === cur ? 'selected' : ''}>${esc(a.name)}</option>`).join('');
   const valid = statsValid(w.stats);
   const strange = w.source && !['Training', 'Technology'].includes(w.source);

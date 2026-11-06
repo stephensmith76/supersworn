@@ -1816,7 +1816,8 @@
     "Home: You may make recover moves at your HQ, but you cannot Sojourn here. When you Advance, you may spend experience to add modules to your HQ.",
     "Defenses: When you Withstand Damage, you may roll +heart. If you do, Endure Stress (-1) on a weak hit or miss.",
     "Personal touch: When you Make a Connection with someone in your HQ, add +1 and take +1 momentum on a hit."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/stash",
@@ -1835,7 +1836,8 @@
     "Your HQ can hold up to +3 stash. When you gain Resources, you may put it into stash instead. When you make a move using +resources, you may add +stash. When you Sacrifice Resources, you may suffer -stash for any part of the cost instead.",
     "When you roll a miss or weak hit on a move to negotiate or barter and have at least 1 stash, you can sweeten the deal: reroll all dice and add +stash. Then suffer -1 stash.",
     "You may Resupply by going through your stash. If you do, add +stash to your roll. Then -1 stash."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/caretaker",
@@ -1852,7 +1854,8 @@
     "When you Secure an Advantage by talking it over with your Caretaker, add +1 and take +1 momentum on a hit.",
     "When you Hearten while spending time with this person, add +1 and take +1 momentum on a hit.",
     "When this person provides healing, add +1 to your Heal roll."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/special_vehicle",
@@ -1873,7 +1876,8 @@
     "When you take your vehicle to a location, take +1 momentum when you arrive.",
     "When you use your vehicle to Face Danger, you may add +integrity and take +1 momentum. If you do and must Pay the Price, you must Withstand Damage.",
     "Your vehicle has weapons. When you Strike or Clash with your vehicle, add +1. On a strong hit with a match, mark progress."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/kit",
@@ -1895,7 +1899,8 @@
     "Prepared: Kit has its own track (0 to +3). When you Resupply at your HQ, you may put Resources into Kit instead, one for one. When you make a move and say what useful item you pull out, spend 1 Kit to add +1 (+2 when the item is the whole answer, like a lockpick on a lock).",
     "Specialty: Pick one kind of gear (forensics, medical, electronics, climbing, nonlethal weapons). When you use it, take +1 momentum on a hit.",
     "Never caught short: When you'd be Unprepared, you may clear all Kit to ignore it for one scene."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/investigator",
@@ -1909,7 +1914,8 @@
     "Crime scene: When you Work the Case by examining evidence or a scene, add +1. On a strong hit, roll two clue prompts and pick one.",
     "Read the room: When you Gather Information or Compel by questioning someone, add +1. On a strong hit with a match, you catch them in a lie. Add a clue to a related case.",
     "The whole picture: Once per case, when you Theorize, reroll one challenge die."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/genius",
@@ -1923,7 +1929,8 @@
     "Planning: When you Secure an Advantage through planning and preparation, add +1 and take +1 momentum on a hit.",
     "Proper preparation: Before you Face Danger, you may envision how you planned for this. Add +1 and take +1 momentum on a hit.",
     "Mad scientist: You may build, maintain and Repair powers that have the Technology source."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/secret_identity",
@@ -1939,7 +1946,8 @@
     "Blending in: Add +1 to +shadow rolls when you're using your fake identity. (-1 instead at Heat 4+.)",
     "Who?: Add +1 when you Face Danger by changing into your fake identity without anybody seeing.",
     "Big reveal: You may reveal your identity with a flourish. This only works once per witness. Add +3 to your next roll involving those who saw it."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/vigilante",
@@ -1953,7 +1961,8 @@
     "You listen to police radio chatter. When you do this to Gather Information, add +1 and take +1 momentum on a hit.",
     "Your belief drives you. Take +1 momentum when you score a hit on a move against those who've committed crimes.",
     "Some on the force believe in what you do. When you Compel police or other authorities, add +1 and take +1 momentum on a hit. (Doesn't work at Heat 2+.)"
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/journalist",
@@ -1967,7 +1976,8 @@
     "Find a lead: When working on a story, add +1 to Compel and Gather Information rolls related to it.",
     "I know someone who knows someone: When you need a lead, roll +heart and take +1 momentum on a hit. On a strong hit, you know an NPC who knows something and owes you. On a weak hit, they know something but despise you. On a miss, your digging brings up trouble. Pay the Price.",
     "The truth is out there: When you Fulfill Your Vow on a vow that involves exposing the truth, you may reroll the challenge dice if you expose yourself to danger. If you do, start a tension clock as an organization or foe begins to hunt you down."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/code_of_honor",
@@ -1983,7 +1993,8 @@
     "When your Code makes your life more difficult (refusing to use guns in a gunfight, refusing to kill an adversary who is sure to turn up later), take +1 momentum.",
     "When you Face Desolation, add +1 and take +1 momentum on a hit as your Code strengthens your spirit.",
     "If you no longer believe in your Code, you may forsake it. Lose this asset, take a new Path and get its second ability for free."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/bloodthirsty",
@@ -1997,7 +2008,8 @@
     "When you mark progress by wounding your enemies, take +1 momentum. Take +1 Heat.",
     "When you Compel using a show of violence to intimidate, add +1 and take +1 momentum on a hit.",
     "When you Take Decisive Action by brutally wounding or killing an enemy, you may burn momentum to cancel one challenge die if your momentum is greater. Endure Stress (-2) and take +2 Heat."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/employed",
@@ -2018,7 +2030,8 @@
     "Your organization has resources and contacts. Add +1 to Gather Information when you use its networks or resources. If you do, +1 on this asset's track.",
     "Your organization can provide recovery help. Add +1 to Heal and Resupply when you use it. If you do, +1 on the track.",
     "Your organization can send backup. When facing a foe, call them in to reduce the foe's rank by one. Envision the backup. If you do, +3 on the track."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/independent",
@@ -2030,9 +2043,10 @@
    "note": "",
    "abilities": [
     "Isolation: When you Hearten in isolation, add +1 and take +1 momentum on a hit.",
-    "I work alone: When you Swear an Iron Vow to do something on your own, you may reroll any dice.",
+    "I work alone: When you Swear an Iron Vow to do something on your own, you may reroll the challenge dice.",
     "Lone wolf: When you face more than one opponent in combat, add +1 to your rolls."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/power_gadgeteer",
@@ -2048,7 +2062,8 @@
     "Utility belt: Your Kit track goes to +5. When you Resupply at your HQ, you may put Resources into Kit one for one.",
     "Built for this: Once per session, envision a gadget you made for exactly this situation. Spend 2 Kit and take an automatic strong hit on the move it helps with.",
     "Tinker: When you Repair or build gear at your HQ, add +1. On a hit, also take +1 Kit."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/power_healing_factor",
@@ -2065,7 +2080,8 @@
     "Fast mender: When you Heal yourself or are healed, add +1. On a hit, take +1 more health.",
     "Shake it off: Once per scene, when you Endure Harm, you may roll +iron instead of +health.",
     "Not today: The first time you would die on Face Death, you survive with 0 health and are out of action until the next session. Then cross out this ability."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/power_super_strength",
@@ -2082,7 +2098,8 @@
     "Strong like an ox: When you use your strength to Face Danger, add +1 and take +1 momentum on a hit.",
     "Hits like a brick: When you Strike or Clash bare-handed, add +1 and take +1 momentum on a hit.",
     "Hold the line: When you Endure Harm while shielding someone, add +1."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/power_toughness",
@@ -2099,7 +2116,8 @@
     "Tough: Your max health is 6.",
     "I can take it: When you Endure Harm and score a hit, take +1 momentum.",
     "Won't stay down: Once per session, when harm would put you out of action, stay on your feet with 1 health."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/power_enhanced_senses",
@@ -2116,7 +2134,8 @@
     "Keen: When your sense helps you Gather Information or Work the Case, add +1 and take +1 momentum on a hit.",
     "Nothing gets past you: When someone tries to ambush you, add +1 to Enter the Fray or React Under Fire.",
     "On the trail: You can follow someone across the city by scent, sound or sight. Face Danger +wits; on a hit, you find them."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/power_danger_sense",
@@ -2133,7 +2152,8 @@
     "Uh oh: Add +1 when you Face Danger to avoid a threat and take +1 momentum on a hit.",
     "See it coming: Add +1 when you React Under Fire or Clash and take +1 momentum on a hit.",
     "See the future: You may roll twice when you Pay the Price and choose your preferred option."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/power_special_weapon",
@@ -2150,7 +2170,8 @@
     "That ain't a knife: When you Enter the Fray by revealing this weapon, add +1 and take +1 momentum on a hit.",
     "How's it feel?: When you Strike with this weapon, choose one: make them scared (add +1 and take +1 momentum on a hit) or make it hurt (mark progress).",
     "This is a knife: When you Take Decisive Action with your weapon, you may Endure Harm (-2) to reroll one challenge die."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/power_super_speed",
@@ -2167,7 +2188,8 @@
     "Fast: When you use your speed to Face Danger, add +1 and take +1 momentum on a hit.",
     "Watch me: When you use your speed in combat, add +1 and take +1 momentum on a hit.",
     "Journeyman: When you use your speed to Undertake an Expedition, you may mark progress even on a miss. This tires you out, and you must rest before using Super-Speed again."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/power_tendrils",
@@ -2183,7 +2205,8 @@
     "Movement: You can sling yourself around if the environment permits. Add +1 when the tendrils assist a non-combat move and take +1 momentum on a hit.",
     "Combat: You can hit, grab, squeeze and throw with your tendrils. Add +1 to a combat move and take +1 momentum on a hit.",
     "Multi-tasking: You may perform two moves at once. Take -1 and make one Face Danger roll. You gain the benefits and take the consequences of each move."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/power_electrical",
@@ -2204,7 +2227,8 @@
     "Spark: You store electricity. When you expose yourself to it, +1 battery. When you use electricity to aid a non-combat move, add +1 and take +1 momentum on a hit, then -1 battery. Battery max +1.",
     "Surge: You may Face Danger (+iron) by exposing yourself to high voltage. On a strong hit, +3 battery. On a weak hit, as above but Endure Harm (-2). You may now spend x battery to add +x to a move. Battery max +3.",
     "Strike: Use stored electricity in combat: add x to your roll and take +1 momentum on a hit, then -x battery. Battery max +5."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/power_super_pet",
@@ -2226,7 +2250,8 @@
     "If your pet uses its powers to aid you when you Face Danger, add +1 and take +1 momentum on a hit. On a miss, your Companion Takes a Hit. Max health 3.",
     "If your pet aids you in battle, add +1 to a combat move and take +1 momentum on a hit. On a miss, your Companion Takes a Hit.",
     "Your pet has a max health of 4."
-   ]
+   ],
+   "tag": "street"
   },
   {
    "id": "ss/power_custom",
@@ -2244,7 +2269,482 @@
     "When you use this power to Face Danger or Secure an Advantage, add +1 and take +1 momentum on a hit.",
     "You can use this power in combat. When you do, add +1 to a combat move and take +1 momentum on a hit.",
     "Write your own: how the power helps with other moves (recovery, suffer, patrol), or a bonus on a strong hit with a match."
-   ]
+   ],
+   "tag": "street"
+  },
+  {
+   "id": "ss/power_biokinesis",
+   "cat": "Power",
+   "name": "Biokinesis",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "You can mold your body into different shapes and sizes. Villain-only under the power ceiling. Fine for a Nemesis.",
+   "abilities": [
+    "You can make yourself moderately larger or smaller. When doing this would aid a roll (larger for intimidating, smaller for sneaking), add +1 and take +1 momentum on a hit.",
+    "You may Face Danger to make yourself small enough to fit through tiny spaces such as door jambs or cracks in a wall.",
+    "You can shift your body to escape death. When you Face Death, you may choose to Face Danger to turn into a puddle and slip away. On a strong hit, witnesses believe you are dead. On a miss, you must still Face Death."
+   ],
+   "tag": "villain"
+  },
+  {
+   "id": "ss/power_invisibility",
+   "cat": "Power",
+   "name": "Invisibility",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "You can turn invisible for a period of time. Villain-only under the power ceiling. Fine for a Nemesis.",
+   "abilities": [
+    "Shade: If you use invisibility to ambush, hide or sneak, set your action die to 5 and roll the challenge dice.",
+    "Surprise: When you reveal yourself with dramatic effect, take +2 momentum.",
+    "Shade 2.0: If you use invisibility to ambush, hide or sneak, set your action die to 6 and roll the challenge dice."
+   ],
+   "tag": "villain"
+  },
+  {
+   "id": "ss/power_flight",
+   "cat": "Power",
+   "name": "Flight",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "You can fly. Villain-only under the power ceiling. Fine for a Nemesis.",
+   "abilities": [
+    "Levitation, holmes: You can use your power to Face Danger to perform great leaps or soften falls from great heights. If you do, add +1 and take +1 momentum on a hit.",
+    "Falling with Style: You can sustain flight for a short time, up to five minutes, needing at least an hour of rest before doing so again.",
+    "Look in the sky!: You can sustain flight for up to an hour. If you use Flight to Undertake an Expedition, achieve an automatic strong hit. You must rest for 6 or more hours after this before flying again."
+   ],
+   "tag": "villain"
+  },
+  {
+   "id": "ss/power_telepathy",
+   "cat": "Power",
+   "name": "Telepathy",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "You can observe, influence and even control the thoughts of others. Take -1 for each additional person you are attempting to interact with. Strange power: a hero from a non-Training, non-Technology source may take one, with a cost.",
+   "abilities": [
+    "You may Face Danger (+wits) to observe the thoughts of those around you. On a strong hit, you know exactly what they are thinking: add +2 to your next roll involving them. On a weak hit, you have a vague idea: add +1 to your next roll involving them. (Roll on the Oracle if unsure.)",
+    "You may Face Danger (+wits) to influence the thoughts of those around you. Envision your influence and roll. On a strong hit, you automatically score a strong hit on the next move involving those people. On a weak hit, add +2 to your next move. Endure Stress (-1) when you do this.",
+    "You may Face Danger (+wits) to control those around you. Envision what you want them to do and roll. You can only control one person at a time. On a strong hit, choose 2; on a weak hit, choose 1: the effect lasts up to an hour; the person will not remember; you do not have to Endure Stress (-2)."
+   ],
+   "tag": "strange"
+  },
+  {
+   "id": "ss/power_telekinesis",
+   "cat": "Power",
+   "name": "Telekinesis",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "You can manipulate objects with your mind. Villain-only under the power ceiling. Fine for a Nemesis.",
+   "abilities": [
+    "Move: You can manipulate small objects (less than 5 pounds) with your mind. When you use this to Face Danger (+wits), add +1 and take +1 momentum on a hit.",
+    "Mind Bullets: You can manipulate small objects with enough force to hurt. When you Strike, Clash, Gain Ground or React Under Fire using Telekinesis, add +1 and take +1 momentum on a hit. On a strong hit with a match, you are exceptionally effective: mark additional progress.",
+    "Mind Over Matter: You may Face Danger (+wits) to move large objects (up to the size of a truck). Endure Stress (-2) when you do so."
+   ],
+   "tag": "villain"
+  },
+  {
+   "id": "ss/power_toughness_original",
+   "cat": "Power",
+   "name": "Toughness (original)",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "Get knocked down seven times, get up eight. Original card. The street version replaces it for heroes.",
+   "abilities": [
+    "Tough: Your max health is +6.",
+    "I Can Take It: Whenever you Endure Harm, gain momentum equal to the amount lost.",
+    "Won't Stop, Can't Stop: The first time you would Face Death and die after taking this ability, you live. Envision how this happens and cross off this ability. It only works once."
+   ],
+   "tag": "original"
+  },
+  {
+   "id": "ss/power_teleportation",
+   "cat": "Power",
+   "name": "Teleportation",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "You can teleport from one place to another. Strange power: a hero from a non-Training, non-Technology source may take one, with a cost.",
+   "abilities": [
+    "See: You can teleport from where you are to somewhere you can see within 30 feet. The place you are teleporting to must be empty. If you do this to Face Danger, roll +wits. As long as you don't roll a 1, you achieve a hit.",
+    "Combat: You can teleport very quickly, giving you an advantage in combat. When you use teleportation to Strike, Clash, Gain Ground or React Under Fire, add +1 and take +1 momentum on a hit.",
+    "Long Distance: You can teleport somewhere you have been before, regardless of distance. Endure Stress (-3) when you do this."
+   ],
+   "tag": "strange"
+  },
+  {
+   "id": "ss/power_elementalist",
+   "cat": "Power",
+   "name": "Elementalist",
+   "fields": [
+    "source",
+    "element"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "You can wield an elemental energy (wind, water, earth, or fire). Strange power: a hero from a non-Training, non-Technology source may take one, with a cost.",
+   "abilities": [
+    "Manipulate: You can detect and manipulate a certain elemental energy. When that energy is in the environment around you, you may use it to Face Danger (+iron). When you do so, add +1 and take +1 momentum.",
+    "Surge: You may use an element around you while in battle. When you do so, add +1 and take +1 momentum on a hit.",
+    "Draw: You can detect and draw the element from miles away, allowing you to use it in almost any situation. Add +2 when you do so and take +2 momentum on a hit."
+   ],
+   "tag": "strange"
+  },
+  {
+   "id": "ss/power_kinesis",
+   "cat": "Power",
+   "name": "____Kinesis",
+   "fields": [
+    "source",
+    "pyro or hydro"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "You can store and wield fire (Pyro-) or water (Hydro-). Abilities are the same as the Starforged Kinetic path. Strange power: a hero from a non-Training, non-Technology source may take one, with a cost.",
+   "abilities": [],
+   "tag": "strange",
+   "sameAs": "sf/path/kinetic"
+  },
+  {
+   "id": "ss/power_enhanced_senses_original",
+   "cat": "Power",
+   "name": "Enhanced Senses (original)",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "Original card. The street version replaces it for heroes.",
+   "abilities": [
+    "Smell: You can smell microscopic particles on a person which might tell you where they have been, what they have been doing, who they have been with. You can also track by scent. When your smell could aid a move, add +1 and take +1 momentum on a hit.",
+    "Hearing: You can hear through walls or across great distances. When you Gather Information using your hearing, add +2 and take +2 momentum on a hit. Also add +1 on Enter the Fray when someone attempts to surprise or ambush you.",
+    "Sight: You can see minute details others would miss, or things from far away. When your sight would aid a move, add +1 and take +1 momentum on a hit."
+   ],
+   "tag": "original"
+  },
+  {
+   "id": "ss/power_armored",
+   "cat": "Power",
+   "name": "Armored",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "Same as the Starforged Armored path. Strange power: a hero from a non-Training, non-Technology source may take one, with a cost.",
+   "abilities": [],
+   "tag": "strange",
+   "sameAs": "sf/path/armored"
+  },
+  {
+   "id": "ss/power_animalism",
+   "cat": "Power",
+   "name": "Animalism",
+   "fields": [
+    "source",
+    "species or type"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "You can speak to and control a certain species or type of animal. Strange power: a hero from a non-Training, non-Technology source may take one, with a cost.",
+   "abilities": [
+    "You can speak to and understand a certain species or type of animal. You may use Compel against animals.",
+    "You may Face Danger (+wits) to call 1d10 animals to your aid. They stay until the current situation ends. When they aid you, add +3, but on a weak hit or miss, 1d6 of the animals perish. If you roll a 1, all the animals flee.",
+    "You may Face Danger (+wits) to call 2d10 animals to your aid."
+   ],
+   "tag": "strange"
+  },
+  {
+   "id": "ss/power_shapeshifter",
+   "cat": "Power",
+   "name": "Shapeshifter",
+   "fields": [
+    "source",
+    "animal"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "You can shapeshift into an animal. Strange power: a hero from a non-Training, non-Technology source may take one, with a cost.",
+   "abilities": [
+    "You may Face Danger (+iron) to shapeshift into an animal. This lasts for an hour. Add +2 to one of your stats that is aided by this form and take -1 to wits. You may shift back as you wish. If you roll a 1, you lose control and the animal mind takes over until the time limit is over.",
+    "You may stay in your animal form indefinitely, and you only lose control if you miss with a match.",
+    "You may Face Danger (+iron) to shapeshift into a terrifying hybrid of human and animal form, but can only hold it for up to 5 minutes. Add +3 to intimidate, command or combat moves while in this form, but any miss causes you to lose control and attack anyone nearby with deadly effect until you shift back."
+   ],
+   "tag": "strange"
+  },
+  {
+   "id": "ss/power_vampirism",
+   "cat": "Power",
+   "name": "Vampirism",
+   "fields": [
+    "source"
+   ],
+   "meters": {
+    "energy": {
+     "max": 5,
+     "label": "energy"
+    }
+   },
+   "requirement": "",
+   "note": "You must feed on humans to live, whether on blood, psychic energy or emotions. This also gives you powers. Strange power: a hero from a non-Training, non-Technology source may take one, with a cost.",
+   "abilities": [
+    "Feed: You must feed on humans using Face Danger or Compel. On a strong hit, add +3 to your Energy; on a weak hit, add +2. On a miss, add +2 but make a suffer move (-2). You may take -x Energy to gain +x on a move. If you reach 0 Energy, take -1 health daily until you feed.",
+    "Control: You may take -1 Energy to add +3 to Compel.",
+    "Shapeshift: You may spend -2 Energy to shapeshift into a wolf or bat. Add +2 to a move aided by the transformation. On a miss, you must transform back."
+   ],
+   "tag": "strange"
+  },
+  {
+   "id": "ss/power_elasticity",
+   "cat": "Power",
+   "name": "Elasticity",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "You can stretch and elongate your body to extreme lengths. Strange power: a hero from a non-Training, non-Technology source may take one, with a cost.",
+   "abilities": [
+    "Squeeze: You can fit through tiny cracks or other similarly small holes. Add +1 when you Face Danger while doing this and take +1 momentum on a hit.",
+    "Stretch: You can use your stretchy body to fling, attack, wrap around, or otherwise attack multiple foes. Add +1 to a combat move when using your power and take +1 momentum on a hit.",
+    "Bounce: You can use your elasticity to avoid or reduce harm. When you do so to Endure Harm, add +1 and take +1 momentum on a hit."
+   ],
+   "tag": "strange"
+  },
+  {
+   "id": "ss/power_clairvoyance",
+   "cat": "Power",
+   "name": "Clairvoyance",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "Same as the Starforged Seer path. Villain-only under the power ceiling. Fine for a Nemesis.",
+   "abilities": [],
+   "tag": "villain",
+   "sameAs": "sf/path/seer"
+  },
+  {
+   "id": "ss/power_shadow_manipulation",
+   "cat": "Power",
+   "name": "Shadow Manipulation",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "Same as the Starforged Shade path. Strange power: a hero from a non-Training, non-Technology source may take one, with a cost.",
+   "abilities": [],
+   "tag": "strange",
+   "sameAs": "sf/path/shade"
+  },
+  {
+   "id": "ss/power_illusions",
+   "cat": "Power",
+   "name": "Illusions",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "You can create illusions to trick, manipulate and influence people. Strange power: a hero from a non-Training, non-Technology source may take one, with a cost.",
+   "abilities": [
+    "You can concentrate and create an illusion that tricks one sense (sight, sound, scent). When you use this to Face Danger or Compel, add +1 and take +1 momentum on a hit. The illusion fades when you stop concentrating.",
+    "You can concentrate and either Endure Stress or Sacrifice Resources (-1) to create a multi-sensory illusion. When you do so, you may Compel and achieve an automatic strong hit.",
+    "You can create an extremely complex and convincing illusion. Anyone who witnesses it believes in it. Envision how this aids you and take an automatic strong hit on the next move you make."
+   ],
+   "tag": "strange"
+  },
+  {
+   "id": "ss/power_force_fields",
+   "cat": "Power",
+   "name": "Force Fields",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "You can create and manipulate force fields. Strange power: a hero from a non-Training, non-Technology source may take one, with a cost.",
+   "abilities": [
+    "Personal: You may Face Danger (+wits) to throw up a force field to deflect or block incoming harm directed at you. On a strong hit, the harm is negated. On a weak hit, reduce the harm taken by 1.",
+    "Shared: You may Face Danger (+wits) to throw up force fields to protect others.",
+    "Containment: You may Face Danger (+wits) to create a force field to contain one or multiple foes. On a strong hit, the foes are incapacitated and cannot break out while you maintain focus. On a weak hit, you must Face Danger (+wits) after one minute to maintain the field."
+   ],
+   "tag": "strange"
+  },
+  {
+   "id": "ss/power_time_travel",
+   "cat": "Power",
+   "name": "Time Travel",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "You can manipulate and even move through time. Strange power: a hero from a non-Training, non-Technology source may take one, with a cost.",
+   "abilities": [
+    "Look: You may Endure Stress (-1) to peer into the future or the past of the location you are in. When you do this to Gather Information, add +1 and take +1 momentum on a hit.",
+    "Redo: You may Endure Stress (-2) to move back through time. You may do this and redo a move, adding +1 with your future knowledge.",
+    "Loop: You may Endure Stress (-3) to move back through time and reroll a progress move."
+   ],
+   "tag": "strange"
+  },
+  {
+   "id": "ss/power_ice_control",
+   "cat": "Power",
+   "name": "Ice Control",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "You have powers over ice. Strange power: a hero from a non-Training, non-Technology source may take one, with a cost.",
+   "abilities": [
+    "Ice to meet you!: You can create and use ice to block harm or move quickly. When you do this to Face Danger, add +1 and take +1 momentum on a hit.",
+    "Everybody, Chill!: You may use your ice powers in battle, whether flinging ice daggers or simply freezing your opponents to the ground. Add +1 and take +1 momentum when you do so.",
+    "Let's kick some ice!: You may make a suffer move (-3) to unleash a blast of ice, freezing everything and everyone around you within 30 to 40 feet. This effect is instantaneous."
+   ],
+   "tag": "strange"
+  },
+  {
+   "id": "ss/power_weather_control",
+   "cat": "Power",
+   "name": "Weather Control",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "You can control the weather. Strange power: a hero from a non-Training, non-Technology source may take one, with a cost.",
+   "abilities": [
+    "You can change the weather gradually over time. Going from a sunny day to a downpour takes about 10 minutes, and must be possible with the season and environment. Less drastic changes take less time. You can isolate the weather over a small location such as a town or neighborhood.",
+    "You can change the weather drastically and quickly. It can be unseasonal and even impossible for the current season or environment (snowing in summer, raining indoors). You can localize it to a location as small as a house or as large as a city.",
+    "You can use specific weather effects (freezing wind, painful hail, a lightning strike) to intimidate or injure others. Add +2 to your roll when you do so."
+   ],
+   "tag": "strange"
+  },
+  {
+   "id": "ss/power_invulnerability",
+   "cat": "Power",
+   "name": "Invulnerability",
+   "fields": [
+    "source",
+    "weakness"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "You are invulnerable to physical harm and damage, but you do have a weakness. Strange power: a hero from a non-Training, non-Technology source may take one, with a cost.",
+   "abilities": [
+    "Whenever you would Endure Harm from a physical attack, if your invulnerability would apply, instead Endure Stress, Lose Momentum, or Sacrifice Resources.",
+    "When someone witnesses your invulnerability in action, you may add +1 if you Compel them using intimidation.",
+    "If you Face Death and would die, you do not, even when your weakness is used against you. Instead, you go into a coma for 2d10 days. Envision what happens during this time and what you wake up to."
+   ],
+   "tag": "strange"
+  },
+  {
+   "id": "ss/power_cloning",
+   "cat": "Power",
+   "name": "Cloning",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "You can clone yourself. Strange power: a hero from a non-Training, non-Technology source may take one, with a cost.",
+   "abilities": [
+    "One: You can make a single clone of yourself, exactly similar in appearance and ability. When you work together, add +2 and take +2 momentum on a hit. When you would Endure Harm, you can instead choose Companion Takes a Hit, but once you do, your clone is gone.",
+    "Many: You can make multiple copies of yourself. When you work together, you may perform multiple tasks or engage multiple foes at the same time and only roll once. You must use Companion Takes a Hit when you Pay the Price, and your clones evaporate.",
+    "The Prestige: You may make one perfect clone of yourself. They are the same as you in almost every way. If you ever Face Death and die, you may play as your clone."
+   ],
+   "tag": "strange"
+  },
+  {
+   "id": "ss/power_plant_control",
+   "cat": "Power",
+   "name": "Plant Control",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "You can control plants. Strange power: a hero from a non-Training, non-Technology source may take one, with a cost.",
+   "abilities": [
+    "You can make plants grow and move incredibly fast. If you do so when you Face Danger, add +1 and take +1 momentum on a hit.",
+    "You can use plants to attack, grab or otherwise harm others. When you do so in combat, add +1 to a combat move and take +1 momentum on a hit.",
+    "You may Heal just from being in a wild place with lots of plant life. When you do so, add +1 and take +1 momentum on a hit."
+   ],
+   "tag": "strange"
+  },
+  {
+   "id": "ss/power_sand_manipulation",
+   "cat": "Power",
+   "name": "Sand Manipulation",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "You can become, move, and manipulate sand. Strange power: a hero from a non-Training, non-Technology source may take one, with a cost.",
+   "abilities": [
+    "You can turn parts or all of your body into sand. When you use this to Face Danger, add +1 and take +1 momentum on a hit.",
+    "You can turn your fists into hammers or other weapons. When you use this in combat, add +1 and take +1 momentum on a hit.",
+    "When you acquire more sand, you can grow in size. You can also Heal, achieving an automatic strong hit if you find a sizable amount of sand. If you Face Death, you don't die: you become sand for 2d10 days until you can come together and reform."
+   ],
+   "tag": "strange"
+  },
+  {
+   "id": "ss/power_super_strength_original",
+   "cat": "Power",
+   "name": "Super-Strength (original)",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "You are stronger than humanly possible. Original card. The street version replaces it for heroes.",
+   "abilities": [
+    "Strong Like Ox: When you use your strength to Face Danger, add +1 and take +1 momentum on a hit.",
+    "Hit Like A Brick: When you use your strength in combat, add +1 to a combat move and take +1 momentum on a hit.",
+    "Inner Strength: You may Endure Harm (-x) to add x to any strength-based roll."
+   ],
+   "tag": "original"
+  },
+  {
+   "id": "ss/power_healing_factor_original",
+   "cat": "Power",
+   "name": "Healing Factor (original)",
+   "fields": [
+    "source"
+   ],
+   "meters": {},
+   "requirement": "",
+   "note": "You heal incredibly fast. Original card. The street version replaces it for heroes.",
+   "abilities": [
+    "During any time of rest, you may roll +iron and gain +1 health on a hit.",
+    "At any time, even in the midst of battle, you may roll +iron to heal. On a strong hit, gain +2 health; on a weak hit, gain +1.",
+    "NOT TODAY, DEATH: When you Face Death and miss, you are considered dead by anyone who witnessed it or sees you in the next couple of days, as your Healing Factor brings you back from the brink. Envision what happens during this time and where you are when you wake up. When you wake, set your health, spirit, Resources and momentum to 0."
+   ],
+   "tag": "original"
   }
  ],
  "sources": [
