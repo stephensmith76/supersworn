@@ -76,10 +76,10 @@ export const MOVE_EFFECTS = {
     missMatch: [ptp, { t: 'oracle', id: 'ss/all_hell' }, { t: 'nemesis' }, { t: 'escape' }],
   },
   'ss/work_the_case': {
-    strong: [progress(1, 'case'), { t: 'oracle', id: 'ss/clue' }],
-    weak: [progress(1, 'case'), { t: 'oracle', id: 'ss/clue' }, one(suffer(1), { t: 'heat', n: 1 }, { t: 'nemesis' })],
+    strong: [{ t: 'clue' }, mom(1)],
+    weak: [{ t: 'clue' }, one(suffer(1), { t: 'heat', n: 1 }, { t: 'nemesis' })],
     miss: [ptp],
-    missMatch: [ptp, note('False lead: next time you Solve the Case, roll one challenge die twice and use the higher.'), { t: 'nemesis' }],
+    missMatch: [ptp, note('Someone got there first: cross off one clue that isn\'t part of a theory yet (the × next to it on the Tracks tab).'), { t: 'nemesis' }],
   },
 };
 // Gather Information with a match also ticks a scheme clock.
@@ -99,10 +99,10 @@ export const TRACK_EFFECTS = {
     miss: [one({ t: 'abandon' }, setback)],
   },
   case: {
-    name: 'Solve the Case',
-    strong: [mom(2), { t: 'milestone' }, done, note('The confrontation drops one rank.')],
-    weak: [{ t: 'milestone' }, { t: 'nemesis' }, done, note('They know you are coming: advance their scheme or face an ambush.')],
-    miss: [one({ t: 'wrongPerson' }, setback)],
+    name: 'Theorize',
+    strong: [note('Your theory is the truth. You know where to find them: the confrontation drops one rank.'), mom(2), { t: 'milestone' }, done],
+    weak: [note('Your theory is true. Choose one: they know you are coming (advance their scheme or face an ambush), one detail is wrong (revealed when you confront them), or you cannot prove it (you need a confession or to catch them in the act).'), { t: 'milestone' }, { t: 'nemesis' }, done],
+    miss: [note('You are wrong. Your clues stay, but you cannot Theorize on this case again until you add a new clue.'), ptp, { t: 'wrongPerson' }],
   },
   vow: {
     name: 'Fulfill Your Vow',

@@ -70,10 +70,13 @@ const cleanHero = entity((h, k) => ({
   assets: map(h.assets, cleanAsset),
 }));
 
+const cleanClue = entity((c, k) => ({ id: k, created: created(c), text: str(c.text, 300), prompt: str(c.prompt, 300), gone: !!c.gone }));
+const cleanSuspect = entity((c, k) => ({ id: k, created: created(c), text: str(c.text, 300), prompt: str(c.prompt, 300) }));
 const cleanTrack = entity((t, k) => ({
   id: k, created: created(t), name: str(t.name, 120),
   type: oneOf(t.type, TRACK_TYPES, 'other'), rank: oneOf(t.rank, RANKS, 'dangerous'),
   ticks: num(t.ticks, 0, 0, 40), done: !!t.done, position: oneOf(t.position, ['control', 'bad'], 'control'),
+  clues: map(t.clues, cleanClue), suspects: map(t.suspects, cleanSuspect), lockAt: num(t.lockAt, 0, 0, 1e15),
 }));
 
 const cleanClock = entity((c, k) => ({

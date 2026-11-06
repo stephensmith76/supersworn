@@ -129,10 +129,8 @@
    "name": "Open a Case",
    "roll": "no_roll",
    "stats": [],
-   "oracles": [
-    "ss/clue"
-   ],
-   "text": "When you __commit to solving a crime or untangling a plot__, name the case and give it a rank (Dangerous or Formidable is typical). Usually a case supports an iron vow, so tie it to one. If there's no vow yet, Swear an Iron Vow too. Start the case with one clue: roll on the Clue oracle."
+   "oracles": [],
+   "text": "Cases have no fixed solution. Nobody knows who did it, including the app. You collect clues, then propose a theory that explains them. If the dice back you up, your theory is the truth.\n\nWhen you __commit to solving a crime or untangling a plot__, name the case and set its complexity: Troublesome (0), Dangerous (1), Formidable (2), Extreme (3) or Epic (4). Usually a case supports an iron vow, so tie it to one, or Swear an Iron Vow too. Start with one clue (roll a clue prompt) and, if you like, a suspect or two."
   },
   {
    "id": "ss/work_the_case",
@@ -146,19 +144,17 @@
     "shadow",
     "edge"
    ],
-   "oracles": [
-    "ss/clue"
-   ],
-   "text": "When you __follow a lead on an open case__, envision the lead and pick your approach:\n\n  * Examining evidence, records or a crime scene: Roll +wits\n  * Working your contacts or interviewing witnesses: Roll +heart\n  * Shaking someone down: Roll +iron\n  * Surveillance, a break-in, or tailing someone: Roll +shadow\n  * Chasing a suspect or racing to a scene in time: Roll +edge\n\nOn a __strong hit__, mark progress on the case and roll a clue (or choose one).\n\nOn a __weak hit__, mark progress and roll a clue, but choose one: make a suffer move (-1); take +1 Heat; or advance a Nemesis scheme clock (someone heard you asking around).\n\nOn a __miss__, the lead goes cold or turns on you. Pay the Price. With a match, you've been fed a false lead: the next time you Solve the Case, roll one challenge die twice and use the higher result."
+   "oracles": [],
+   "text": "When you __follow a lead on an open case__, envision the lead and pick your approach:\n\n  * Examining evidence, records or a crime scene: Roll +wits\n  * Working your contacts or interviewing witnesses: Roll +heart\n  * Shaking someone down: Roll +iron\n  * Surveillance, a break-in, or tailing someone: Roll +shadow\n  * Chasing a suspect or racing to a scene in time: Roll +edge\n\nOn a __strong hit__, add a clue to the case and take +1 momentum.\n\nOn a __weak hit__, add a clue, but choose one: make a suffer move (-1); take +1 Heat; or advance a Nemesis scheme clock (someone heard you asking around).\n\nOn a __miss__, the lead goes cold or turns on you. Pay the Price. With a match, someone got there first: cross off one clue that isn't part of a theory yet.\n\n__Building a clue:__ roll a clue prompt (what it is, how it shows up, what it points toward). Decide what it actually is in the story and write it as one line, like \"a pawn ticket for a wedding ring, dated the night of the murder.\" Keep it concrete, but don't decide what it means yet. On a match, or whenever you want a complication, add a twist."
   },
   {
-   "id": "ss/solve_the_case",
+   "id": "ss/theorize",
    "cat": "Case",
-   "name": "Solve the Case",
+   "name": "Theorize",
    "roll": "progress_roll",
    "stats": [],
    "track": "case",
-   "text": "When you __put the pieces together__, roll the challenge dice and compare to your progress.\n\nOn a __strong hit__, you know who did it, how, and where to find them. Reach a Milestone on the linked vow and take +2 momentum. You choose when and where to confront them, so the confrontation's rank drops one step.\n\nOn a __weak hit__, you know who, but they know you're coming. Reach a Milestone on the linked vow, then advance their scheme clock or face an ambush.\n\nOn a __miss__, you got it wrong. Choose one:\n\n  * Accuse the wrong person: an innocent pays. Take +2 Heat and Pay the Price.\n  * Keep digging: roll both challenge dice, take the lower number and clear that many progress boxes. Raise the case's rank by one and keep working it."
+   "text": "When you __put the pieces together__, agree on a theory: who did it, why, and how. Mark each clue your theory explains. Then make a progress roll with a score equal to the clues used minus the case's complexity (Troublesome 0, Dangerous 1, Formidable 2, Extreme 3, Epic 4; max 10).\n\nOn a __strong hit__, you're right. Your theory is the truth. Reach a Milestone on the linked vow and take +2 momentum. You know where to find them, so the confrontation drops one rank.\n\nOn a __weak hit__, you're right. Reach a Milestone on the linked vow, then choose one:\n\n  * They know you're coming: advance their scheme or face an ambush.\n  * One detail is wrong: it's revealed when you confront them.\n  * You can't prove it: you'll need a confession or to catch them in the act.\n\nOn a __miss__, you're wrong, and acting on it costs you. Pay the Price. If you went public or accused someone, take +2 Heat and an innocent person pays. Your clues stay, but you can't Theorize on this case again until you add a new clue.\n\nA theory doesn't have to use every clue, but each clue it explains improves your odds."
   },
   {
    "id": "ss/nemesis_escape",
@@ -446,7 +442,7 @@
   {
    "id": "ss/clue",
    "group": "Supersworn",
-   "name": "Clue",
+   "name": "Clue (specific)",
    "dice": "1d100",
    "rows": [
     [
@@ -548,6 +544,496 @@
      96,
      100,
      "A clue planted to point at you"
+    ]
+   ]
+  },
+  {
+   "id": "ss/clue/form",
+   "group": "Supersworn: Clues and suspects",
+   "name": "Clue: what it is",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     5,
+     "An object left behind"
+    ],
+    [
+     6,
+     10,
+     "A document or note"
+    ],
+    [
+     11,
+     15,
+     "A photo or video"
+    ],
+    [
+     16,
+     20,
+     "A phone, message or call log"
+    ],
+    [
+     21,
+     25,
+     "A stain, mark or residue"
+    ],
+    [
+     26,
+     30,
+     "A wound or injury"
+    ],
+    [
+     31,
+     35,
+     "Something missing"
+    ],
+    [
+     36,
+     40,
+     "Something that doesn't belong"
+    ],
+    [
+     41,
+     45,
+     "A witness's account"
+    ],
+    [
+     46,
+     50,
+     "A lie someone tells"
+    ],
+    [
+     51,
+     55,
+     "A rumor on the street"
+    ],
+    [
+     56,
+     60,
+     "A broken habit or routine"
+    ],
+    [
+     61,
+     65,
+     "A smell or sound"
+    ],
+    [
+     66,
+     70,
+     "A receipt, ticket or record"
+    ],
+    [
+     71,
+     75,
+     "A key, code or access card"
+    ],
+    [
+     76,
+     80,
+     "A change to the scene"
+    ],
+    [
+     81,
+     85,
+     "A gift or keepsake"
+    ],
+    [
+     86,
+     90,
+     "Money, or its trail"
+    ],
+    [
+     91,
+     95,
+     "A symbol or sign"
+    ],
+    [
+     96,
+     100,
+     "Behavior someone can't hide"
+    ]
+   ]
+  },
+  {
+   "id": "ss/clue/detail",
+   "group": "Supersworn: Clues and suspects",
+   "name": "Clue: how it shows up",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     5,
+     "Half destroyed"
+    ],
+    [
+     6,
+     10,
+     "Carefully hidden"
+    ],
+    [
+     11,
+     15,
+     "In plain sight"
+    ],
+    [
+     16,
+     20,
+     "Expensive"
+    ],
+    [
+     21,
+     25,
+     "Cheap and common"
+    ],
+    [
+     26,
+     30,
+     "Old, from years ago"
+    ],
+    [
+     31,
+     35,
+     "Fresh, minutes old"
+    ],
+    [
+     36,
+     40,
+     "Found more than once"
+    ],
+    [
+     41,
+     45,
+     "Personal and intimate"
+    ],
+    [
+     46,
+     50,
+     "Official or institutional"
+    ],
+    [
+     51,
+     55,
+     "Out of place"
+    ],
+    [
+     56,
+     60,
+     "Left on purpose to be found"
+    ],
+    [
+     61,
+     65,
+     "Wrong in a small way"
+    ],
+    [
+     66,
+     70,
+     "Stained or damaged"
+    ],
+    [
+     71,
+     75,
+     "Belongs to someone else"
+    ],
+    [
+     76,
+     80,
+     "Incomplete"
+    ],
+    [
+     81,
+     85,
+     "From outside the neighborhood"
+    ],
+    [
+     86,
+     90,
+     "Childish or innocent"
+    ],
+    [
+     91,
+     95,
+     "Professional work"
+    ],
+    [
+     96,
+     100,
+     "Too clean"
+    ]
+   ]
+  },
+  {
+   "id": "ss/clue/points",
+   "group": "Supersworn: Clues and suspects",
+   "name": "Clue: points toward",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     5,
+     "Someone close to the victim"
+    ],
+    [
+     6,
+     10,
+     "Money"
+    ],
+    [
+     11,
+     15,
+     "An old grudge"
+    ],
+    [
+     16,
+     20,
+     "A place in the city"
+    ],
+    [
+     21,
+     25,
+     "A secret relationship"
+    ],
+    [
+     26,
+     30,
+     "Someone with access"
+    ],
+    [
+     31,
+     35,
+     "The police or city hall"
+    ],
+    [
+     36,
+     40,
+     "A rival crime group"
+    ],
+    [
+     41,
+     45,
+     "Family"
+    ],
+    [
+     46,
+     50,
+     "A hidden past"
+    ],
+    [
+     51,
+     55,
+     "A second person at the scene"
+    ],
+    [
+     56,
+     60,
+     "A specific time"
+    ],
+    [
+     61,
+     65,
+     "A skill or trade"
+    ],
+    [
+     66,
+     70,
+     "Fear or blackmail"
+    ],
+    [
+     71,
+     75,
+     "Someone who should have been elsewhere"
+    ],
+    [
+     76,
+     80,
+     "Power or ambition"
+    ],
+    [
+     81,
+     85,
+     "A Nemesis"
+    ],
+    [
+     86,
+     90,
+     "Love or jealousy"
+    ],
+    [
+     91,
+     95,
+     "Desperation"
+    ],
+    [
+     96,
+     100,
+     "A cover-up"
+    ]
+   ]
+  },
+  {
+   "id": "ss/clue/twist",
+   "group": "Supersworn: Clues and suspects",
+   "name": "Clue: twist",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     10,
+     "It contradicts another clue"
+    ],
+    [
+     11,
+     20,
+     "It was planted"
+    ],
+    [
+     21,
+     30,
+     "Someone else wants it"
+    ],
+    [
+     31,
+     40,
+     "It puts a witness in danger"
+    ],
+    [
+     41,
+     50,
+     "It's only half the story"
+    ],
+    [
+     51,
+     60,
+     "It implicates a friend"
+    ],
+    [
+     61,
+     70,
+     "It's being watched"
+    ],
+    [
+     71,
+     80,
+     "It won't last: it'll be gone soon"
+    ],
+    [
+     81,
+     90,
+     "It points at you"
+    ],
+    [
+     91,
+     100,
+     "Someone talks only for a price"
+    ]
+   ]
+  },
+  {
+   "id": "ss/suspect/hiding",
+   "group": "Supersworn: Clues and suspects",
+   "name": "Suspect: what they're hiding",
+   "dice": "1d100",
+   "rows": [
+    [
+     1,
+     5,
+     "An affair"
+    ],
+    [
+     6,
+     10,
+     "A debt they can never repay"
+    ],
+    [
+     11,
+     15,
+     "A crime from long ago"
+    ],
+    [
+     16,
+     20,
+     "Their real name"
+    ],
+    [
+     21,
+     25,
+     "A habit they can't quit"
+    ],
+    [
+     26,
+     30,
+     "They were there that night"
+    ],
+    [
+     31,
+     35,
+     "They profit from this"
+    ],
+    [
+     36,
+     40,
+     "They're protecting someone"
+    ],
+    [
+     41,
+     45,
+     "They're being blackmailed"
+    ],
+    [
+     46,
+     50,
+     "A second family"
+    ],
+    [
+     51,
+     55,
+     "Loyalty to a gang"
+    ],
+    [
+     56,
+     60,
+     "They're an informant"
+    ],
+    [
+     61,
+     65,
+     "They lost their job and told no one"
+    ],
+    [
+     66,
+     70,
+     "A grudge against the victim"
+    ],
+    [
+     71,
+     75,
+     "Someone they secretly support"
+    ],
+    [
+     76,
+     80,
+     "They're terrified of someone"
+    ],
+    [
+     81,
+     85,
+     "They know who did it"
+    ],
+    [
+     86,
+     90,
+     "They tried to stop it"
+    ],
+    [
+     91,
+     95,
+     "Nothing, and that's suspicious"
+    ],
+    [
+     96,
+     100,
+     "A costumed identity"
     ]
    ]
   },
@@ -1420,9 +1906,9 @@
    "requirement": "",
    "note": "",
    "abilities": [
-    "Crime scene: When you Work the Case by examining evidence or a scene, add +1. On a strong hit, roll two clues and pick one.",
-    "Read the room: When you Gather Information or Compel by questioning someone, add +1. On a strong hit with a match, you catch them in a lie. Mark progress on a related case.",
-    "The whole picture: Once per case, when you Solve the Case, reroll one challenge die."
+    "Crime scene: When you Work the Case by examining evidence or a scene, add +1. On a strong hit, roll two clue prompts and pick one.",
+    "Read the room: When you Gather Information or Compel by questioning someone, add +1. On a strong hit with a match, you catch them in a lie. Add a clue to a related case.",
+    "The whole picture: Once per case, when you Theorize, reroll one challenge die."
    ]
   },
   {

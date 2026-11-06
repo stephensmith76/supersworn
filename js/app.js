@@ -42,7 +42,7 @@ async function loadData() {
 const ui = {
   tab: 'heroes', heroId: null, modal: null, lastRoll: null, oracleResults: [], moveId: '', rollStat: 'iron',
   rollAdds: 0, rollHero: null, moveQuery: '', oracleQuery: '', assetQuery: '', pendingRender: false, drafts: {},
-  manual: {}, d100: '',
+  manual: {}, d100: '', theory: {},
 };
 const physical = () => store.prefs.physical === '1';
 function dicePicker(label, key, max) {
@@ -243,6 +243,88 @@ function viewAssetPicker() {
       <button class="btn" data-act="addAsset" data-ref="${a.id}">Add ${esc(a.name)}</button></details>`).join('')}`).join('')}`;
 }
 
+
+// ---------- cases: clues, suspects, theories ----------
+const COMPLEXITY = { troublesome: 0, dangerous: 1, formidable: 2, extreme: 3, epic: 4 };
+function cluePrompt() {
+  const r = id => rollOracle(D.oracleById[id], D.oracleById).text;
+  return `${r('ss/clue/form')}. ${r('ss/clue/detail')}. Points toward: ${r('ss/clue/points').toLowerCase()}.`;
+}
+function suspectPrompt() {
+  const role = D.oracleById['sf/characters/role'] ? rollOracle(D.oracleById['sf/characters/role'], D.oracleById).text : 'Someone';
+  return `${role}. Hiding: ${rollOracle(D.oracleById['ss/suspect/hiding'], D.oracleById).text.toLowerCase()}.`;
+}
+function addClue(trackId, prompt = cluePrompt()) {
+  const c = { id: uid(), created: Date.now(), text: '', prompt, gone: false };
+  store.set(['tracks', trackId, 'clues', c.id], c);
+  const t = S().tracks[trackId];
+  log(`**Clue for ${t ? t.name || 'the case' : 'the case'}:** ${prompt}`, 'oracle');
+  return c;
+}
+function activeClues(t) { return sorted(t.clues).filter(c => !c.gone); }
+function caseLocked(t) { return t.lockAt > 0 && !activeClues(t).some(c => c.created > t.lockAt); }
+
+function caseBlock(t) {
+  const p = ['tracks', t.id];
+  const clues = sorted(t.clues);
+  const sel = (ui.theory[t.id] || {});
+  const used = activeClues(t).filter(c => sel[c.id]).length;
+  const cx = COMPLEXITY[t.rank] || 0;
+  const score = Math.max(0, Math.min(10, used - cx));
+  const locked = caseLocked(t);
+  const phys = physical();
+  const haveDice = ui.manual.p1 && ui.manual.p2;
+  const ai = aiReady();
+  return `<div class="casebox">
+    <h4>Clues <small>${activeClues(t).length} · complexity ${cx}</small></h4>
+    ${clues.length ? `<ul class="clues">${clues.map(c => `<li class="${c.gone ? 'gone' : ''}">
+      <input type="checkbox" class="cluecheck" data-theory="${esc(t.id)}" data-clue="${esc(c.id)}" ${sel[c.id] && !c.gone ? 'checked' : ''} ${c.gone ? 'disabled' : ''} aria-label="Use this clue in the theory">
+      <span class="cluebody">${input(p.concat(['clues', c.id, 'text']), c.text, { placeholder: 'What is it, exactly? One concrete line.' })}
+      ${c.prompt ? `<small class="prompt">${esc(c.prompt)}</small>` : ''}</span>
+      <span class="cluebtns"><button class="btn sm" data-act="clueTwist" data-t="${esc(t.id)}" data-c="${esc(c.id)}" ${c.gone ? 'disabled' : ''}>Twist</button>
+      <button class="btn sm" data-act="clueGone" data-t="${esc(t.id)}" data-c="${esc(c.id)}" aria-label="${c.gone ? 'Restore clue' : 'Cross off clue'}">${c.gone ? 'Restore' : '×'}</button></span>
+    </li>`).join('')}</ul>` : '<p class="empty">No clues yet. Work the Case to find some.</p>'}
+    <div class="row wrap"><button class="btn sm accent" data-act="cluePrompt" data-id="${esc(t.id)}">+ Clue prompt</button><button class="btn sm" data-act="clueBlank" data-id="${esc(t.id)}">+ Blank clue</button></div>
+    <h4>Suspects</h4>
+    ${sorted(t.suspects).map(s => `<div class="suspect">${input(p.concat(['suspects', s.id, 'text']), s.text, { placeholder: 'Name and who they are' })}
+      <button class="btn sm danger" data-act="del" data-path='${esc(JSON.stringify(p.concat(['suspects', s.id])))}' aria-label="Delete suspect">×</button>
+      ${s.prompt ? `<small class="prompt">${esc(s.prompt)}</small>` : ''}</div>`).join('')}
+    <div class="row wrap"><button class="btn sm" data-act="suspectPrompt" data-id="${esc(t.id)}">+ Suspect</button></div>
+    <div class="theory">
+      <h4>Theorize</h4>
+      <textarea id="theory-${esc(t.id)}" data-draft="1" rows="3" placeholder="Who did it, why, and how? Tick the clues your theory explains.">${esc(ui.drafts['theory-' + t.id] || '')}</textarea>
+      <p class="score">Clues used ${used} − complexity ${cx} = <b>${score}</b> <span class="muted">vs two d10</span></p>
+      ${phys ? `${dicePicker('Challenge die 1 (d10)', 'p1', 10)}${dicePicker('Challenge die 2 (d10)', 'p2', 10)}` : ''}
+      ${locked ? '<p class="alert">Your last theory was wrong. Add a new clue before you Theorize again.</p>' : ''}
+      <div class="row wrap"><button class="btn accent" data-act="theorize" data-id="${esc(t.id)}" ${!locked && used && (!phys || haveDice) ? '' : 'disabled'}>Theorize</button>
+      ${ai ? `<button class="btn sm" data-act="theoryIdeas" data-id="${esc(t.id)}">Ideas from the AI</button>` : ''}</div>
+      ${ui.ideas && ui.ideas.id === t.id ? `<div class="ideas">${md(ui.ideas.text)}</div>` : ''}
+    </div>
+    ${ui.lastRoll && ui.lastRoll.trackId === t.id ? rollCard(ui.lastRoll) : ''}
+  </div>`;
+}
+
+function doTheorize(id) {
+  const t = S().tracks[id];
+  if (!t || caseLocked(t)) return;
+  const sel = ui.theory[id] || {};
+  const used = activeClues(t).filter(c => sel[c.id]);
+  if (!used.length) return;
+  const cx = COMPLEXITY[t.rank] || 0;
+  const score = Math.max(0, Math.min(10, used.length - cx));
+  const m = ui.manual;
+  const dice = physical() ? (m.p1 && m.p2 ? { c1: m.p1, c2: m.p2 } : null) : undefined;
+  if (dice === null) return;
+  const r = progressRoll({ ticks: score * 4, dice });
+  ui.manual = { ...ui.manual, p1: null, p2: null };
+  const hh = S().heroes[ui.rollHero] || currentHero();
+  Object.assign(r, { trackId: id, applied: {}, heroId: hh ? hh.id : null, physical: !!dice, label: `Theorize: ${t.name || 'case'} (${used.length} clues − ${cx})` });
+  ui.lastRoll = r;
+  const theory = (ui.drafts['theory-' + id] || '').trim();
+  if (r.result === 'miss') store.set(['tracks', id, 'lockAt'], Date.now());
+  log(`**${RESULT_LABEL[r.result]}${r.match ? ' (match)' : ''}** ${r.label}${r.physical ? ' (own dice)' : ''}\nScore ${score} vs ${r.c1}, ${r.c2}${theory ? `\n\nTheory: ${theory}` : ''}\n\nClues: ${used.map(c => c.text || c.prompt).join('; ')}`, 'roll');
+}
+
 function viewTracks() {
   const tracks = sorted(S().tracks);
   const clocks = sorted(S().clocks);
@@ -256,20 +338,22 @@ function viewTracks() {
         ${input(p.concat('name'), t.name, { placeholder: 'Name this vow, case or patrol', cls: 'name-in' })}
         <div class="row wrap">
           <select data-bind='${esc(JSON.stringify(p.concat('type')))}'>${D.rules.trackTypes.map(x => `<option ${x === t.type ? 'selected' : ''}>${x}</option>`).join('')}</select>
-          <select data-bind='${esc(JSON.stringify(p.concat('rank')))}'>${RANKS.map(x => `<option ${x === t.rank ? 'selected' : ''}>${x}</option>`).join('')}</select>
+          <select data-bind='${esc(JSON.stringify(p.concat('rank')))}' aria-label="${t.type === 'case' ? 'Complexity' : 'Rank'}">${RANKS.map(x => `<option value="${x}" ${x === t.rank ? 'selected' : ''}>${x}${t.type === 'case' ? ` (complexity ${COMPLEXITY[x]})` : ''}</option>`).join('')}</select>
           ${t.type === 'combat' ? `<select class="pos ${t.position === 'bad' ? 'bad' : 'ok'}" data-bind='${esc(JSON.stringify(p.concat('position')))}'><option value="control" ${t.position !== 'bad' ? 'selected' : ''}>In control</option><option value="bad" ${t.position === 'bad' ? 'selected' : ''}>Bad spot</option></select>` : ''}
-          <span class="muted">${boxes(t.ticks)}/10</span>
+          ${t.type === 'case' ? '' : `<span class="muted">${boxes(t.ticks)}/10</span>`}
         </div>
-        ${trackBoxes(t.ticks)}
+        ${t.type === 'case' ? caseBlock(t) : `${trackBoxes(t.ticks)}
         <div class="row wrap">
           <button class="btn" data-act="markProgress" data-id="${t.id}">Mark progress</button>
           <button class="btn sm" data-act="tick" data-path='${esc(JSON.stringify(p.concat('ticks')))}' data-n="-1">−1</button>
           <button class="btn sm" data-act="tick" data-path='${esc(JSON.stringify(p.concat('ticks')))}' data-n="1">+1</button>
           <button class="btn accent" data-act="progressRoll" data-id="${t.id}">Roll progress</button>
+        </div>
+        ${ui.lastRoll && ui.lastRoll.trackId === t.id ? rollCard(ui.lastRoll) : ''}`}
+        <div class="row wrap">
           <button class="btn sm" data-act="toggleDone" data-id="${t.id}">${t.done ? 'Reopen' : 'Done'}</button>
           <button class="btn sm danger" data-act="del" data-path='${esc(JSON.stringify(p))}'>Delete</button>
         </div>
-        ${ui.lastRoll && ui.lastRoll.trackId === t.id ? rollCard(ui.lastRoll) : ''}
       </div>`;
     }).join('') || '<p class="empty">Vows, cases, patrols and fights all live here.</p>'}
   </section>
@@ -370,7 +454,7 @@ function viewRoll() {
     const g = (m.id.startsWith('ss/') ? 'Supersworn: ' : '') + m.cat;
     (groups[g] = groups[g] || []).push(m);
   }
-  const progTracks = sorted(S().tracks).filter(t => !t.done);
+  const progTracks = sorted(S().tracks).filter(t => !t.done && t.type !== 'case');
   const phys = physical();
   const haveAction = ui.manual.a && ui.manual.c1 && ui.manual.c2;
   const haveProg = ui.manual.p1 && ui.manual.p2;
@@ -393,6 +477,7 @@ function viewRoll() {
   </section>
   <section class="card">
     <h3>Progress roll</h3>
+    <p class="hint">Cases use Theorize, on the case itself on the Tracks tab.</p>
     ${phys ? `${dicePicker('Challenge die 1 (d10)', 'p1', 10)}${dicePicker('Challenge die 2 (d10)', 'p2', 10)}<p class="hint">${haveProg ? 'Now tap the track you are rolling for.' : 'Roll two d10, tap what you got, then tap the track.'}</p>` : ''}
     ${progTracks.length ? `<div class="chips">${progTracks.map(t => `<button class="chip ${ui.progPick === t.id ? 'on' : ''}" data-act="progressRoll" data-id="${t.id}" ${phys && !haveProg ? 'disabled' : ''}>${esc(t.name || t.type)} (${boxes(t.ticks)})</button>`).join('')}</div>` : '<p class="empty">No open tracks.</p>'}
     ${ui.lastRoll && ui.lastRoll.kind === 'progress' ? rollCard(ui.lastRoll) : ''}
@@ -426,6 +511,8 @@ function viewOracles() {
       <button class="chip on" data-act="spark" data-a="sf/core/descriptor" data-b="sf/core/focus">Descriptor + Focus</button>
       <button class="chip on" data-act="spark" data-a="ss/loc/location" data-b="sf/core/descriptor">Place</button>
       <button class="chip on" data-act="spark" data-a="sf/characters/role" data-b="sf/characters/goal">NPC</button>
+      <button class="chip on" data-act="clueSpark">Clue</button>
+      <button class="chip on" data-act="suspectSpark">Suspect</button>
     </div>
     ${ui.oracleResults.length ? `<ol class="results">${ui.oracleResults.map(r => `<li><b>${esc(r.text)}</b> <small>${esc(r.label)}</small></li>`).join('')}</ol>` : '<p class="empty">Tap a table to roll. Results also go to the journal.</p>'}
   </section>
@@ -889,6 +976,49 @@ const actions = {
     ui.recapDraft = ''; ui.endDone.recap = true; render();
   },
   fx(el) { applyFx(el); },
+  cluePrompt(el) { addClue(el.dataset.id); render(); },
+  clueBlank(el) { const c = { id: uid(), created: Date.now(), text: '', prompt: '', gone: false }; store.set(['tracks', el.dataset.id, 'clues', c.id], c); },
+  clueTwist(el) {
+    const tw = rollOracle(D.oracleById['ss/clue/twist'], D.oracleById).text;
+    const c = (S().tracks[el.dataset.t] || {}).clues?.[el.dataset.c];
+    if (!c) return;
+    store.set(['tracks', el.dataset.t, 'clues', c.id, 'prompt'], `${c.prompt ? c.prompt + ' ' : ''}Twist: ${tw.toLowerCase()}.`);
+    log(`**Twist:** ${tw}.`, 'oracle');
+  },
+  clueGone(el) { const c = (S().tracks[el.dataset.t] || {}).clues?.[el.dataset.c]; if (c) store.set(['tracks', el.dataset.t, 'clues', c.id, 'gone'], !c.gone); },
+  suspectPrompt(el) {
+    const prompt = suspectPrompt();
+    const s = { id: uid(), created: Date.now(), text: '', prompt };
+    store.set(['tracks', el.dataset.id, 'suspects', s.id], s);
+    log(`**Suspect:** ${prompt}`, 'oracle');
+  },
+  theorize(el) { doTheorize(el.dataset.id); render(); },
+  async theoryIdeas(el) {
+    const t = S().tracks[el.dataset.id];
+    if (!t || !aiReady()) return;
+    el.disabled = true; el.textContent = 'Thinking…';
+    const clues = activeClues(t).map((c, i) => `${i + 1}. ${c.text || c.prompt}`).join('\n');
+    const sus = sorted(t.suspects).map(s => `- ${s.text || s.prompt}`).join('\n');
+    try {
+      const text = await askRules([{ role: 'user', text: `Our case "${t.name || 'unnamed'}" has these clues:\n${clues || '(none)'}\n\nSuspects:\n${sus || '(none)'}\n\nOffer three different theories (who, why, how) in two or three sentences each. Each should use as many clues as it can; say which clue numbers it explains. Do not pick the true one: there is no fixed answer. No em dashes.` }], buildContext());
+      ui.ideas = { id: t.id, text };
+    } catch (e) { ui.ideas = { id: t.id, text: e.message }; }
+    render();
+  },
+  clueSpark() {
+    const prompt = cluePrompt();
+    ui.oracleResults.unshift({ text: prompt, label: 'Clue prompt' });
+    ui.oracleResults = ui.oracleResults.slice(0, 8);
+    log(`**Clue prompt:** ${prompt}`, 'oracle');
+    render();
+  },
+  suspectSpark() {
+    const prompt = suspectPrompt();
+    ui.oracleResults.unshift({ text: prompt, label: 'Suspect' });
+    ui.oracleResults = ui.oracleResults.slice(0, 8);
+    log(`**Suspect:** ${prompt}`, 'oracle');
+    render();
+  },
   fbKind(el) { ui.fbKind = el.dataset.v; render(); },
   fbSave() {
     const t = document.getElementById('fbtext');
@@ -948,7 +1078,9 @@ function buildContext() {
     }).join('\n');
     return `- ${h.name}: edge ${h.stats.edge}, heart ${h.stats.heart}, iron ${h.stats.iron}, shadow ${h.stats.shadow}, wits ${h.stats.wits}; health ${h.health}, spirit ${h.spirit}, momentum ${h.momentum} (max ${lim.max}, reset ${lim.reset}), heat ${h.heat}; impacts: ${Object.keys(h.impacts).filter(k => h.impacts[k]).join(', ') || 'none'}\n  Assets (enabled abilities marked):\n${as}`;
   }).join('\n');
-  const tracks = sorted(s.tracks).filter(t => !t.done).map(t => `- ${t.name || '(unnamed)'}: ${t.rank} ${t.type}, ${boxes(t.ticks)} boxes (${t.ticks} ticks)`).join('\n');
+  const tracks = sorted(s.tracks).filter(t => !t.done).map(t => t.type === 'case'
+    ? `- Case "${t.name || '(unnamed)'}": complexity ${COMPLEXITY[t.rank]}. Clues: ${activeClues(t).map(c => c.text || c.prompt).join(' | ') || 'none'}. Suspects: ${sorted(t.suspects).map(x => x.text || x.prompt).join(' | ') || 'none'}${caseLocked(t) ? '. Locked: last theory failed, needs a new clue.' : ''}`
+    : `- ${t.name || '(unnamed)'}: ${t.rank} ${t.type}, ${boxes(t.ticks)} boxes (${t.ticks} ticks)`).join('\n');
   const nems = sorted(s.nemeses).map(n => `- ${n.name || '(unnamed)'}: ${n.rank}, ${n.status}, scheme "${n.scheme}" ${n.filled}/${n.segments}. ${n.gimmick}`).join('\n');
   const recent = sorted(s.journal).slice(-6).map(e => `- ${e.text.replace(/\n/g, ' ')}`).join('\n');
   const state = `## Current game\nShared Resources: ${s.shared.resources}\n\nHeroes:\n${heroLines || 'none'}\n\nOpen tracks:\n${tracks || 'none'}\n\nNemeses:\n${nems || 'none'}\n\nRecent journal:\n${recent || 'none'}`;
@@ -995,6 +1127,11 @@ function fxItem(e, key, r, off) {
       return cs.map(c => fxButton(`Fill ${e.n}: ${c.name || 'clock'}`, key, c.id, off, 'warn')).join('');
     }
     case 'nextAdd': return fxButton('+1 on next roll', key, '', off);
+    case 'clue': {
+      const ts = openTracks('case');
+      if (!ts.length) return fxButton('New case track', key + ':new', 'case', false, 'ghost');
+      return ts.map(t => fxButton(`Add clue: ${t.name || 'case'}`, key, t.id, off)).join('');
+    }
     case 'oracle': return fxButton(`Roll ${(D.oracleById[e.id] || {}).name || 'oracle'}`, key, '', off);
     case 'ptp': return fxButton('Pay the Price', key, '', off, 'warn');
     case 'nemesis': {
@@ -1103,6 +1240,7 @@ function applyFx(el) {
       break;
     }
     case 'nextAdd': ui.rollAdds = 1; say('+1 on the next roll'); break;
+    case 'clue': if (S().tracks[arg]) addClue(arg); break;
     case 'oracle': doOracle(e.id); break;
     case 'ptp': doOracle('sf/moves/pay_the_price'); break;
     case 'nemesis': {
@@ -1353,6 +1491,12 @@ function wire() {
   });
   document.addEventListener('change', e => {
     const el = e.target;
+    if (el.dataset.theory) {
+      const m = ui.theory[el.dataset.theory] = ui.theory[el.dataset.theory] || {};
+      m[el.dataset.clue] = el.checked;
+      render();
+      return;
+    }
     if (el.dataset.toggle) {
       const p = JSON.parse(el.dataset.toggle);
       store.set(p, el.checked);

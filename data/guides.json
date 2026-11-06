@@ -24,7 +24,7 @@
     {
      "t": "Search for what you came for",
      "m": "ss/work_the_case",
-     "x": "If this is for a case, use Work the Case +wits (examining records). Strong hit: mark progress on the case and roll a Clue. Weak hit: same, but take +1 Heat, a suffer move, or advance a Nemesis scheme. Not on a case? Use Gather Information instead."
+     "x": "If this is for a case, use Work the Case +wits (examining records). Strong hit: add a clue and take +1 momentum. Weak hit: add a clue, but take +1 Heat, a suffer move, or advance a Nemesis scheme. Tap \"Add clue\" on the result, then turn the prompt into one concrete line on the case: \"Personal and intimate, points toward family\" might become \"a child's drawing taped inside the safe.\" Not on a case? Use Gather Information instead."
     },
     {
      "t": "Something goes wrong (it usually does)",
@@ -34,7 +34,7 @@
     {
      "t": "Get out and update the app",
      "m": null,
-     "x": "Mark progress on the case or vow if you earned it (Reach a Milestone on a vow when you overcome a critical obstacle or gain meaningful insight). Add Heat if anyone saw you or you broke into a public building. Write one line in the journal about what you found."
+     "x": "Mark progress on your vow if you earned it (Reach a Milestone when you overcome a critical obstacle or gain meaningful insight). Clues you found are already on the case. Add Heat if anyone saw you or you broke into a public building. Write one line in the journal about what you found."
     }
    ]
   },
@@ -117,28 +117,43 @@
   {
    "id": "case",
    "title": "Work a case from start to finish",
-   "summary": "Open it, follow leads, put the pieces together, then confront the culprit.",
-   "tip": "",
+   "summary": "No fixed answer: collect clues, build a theory together, and let the dice decide if it holds.",
+   "tip": "Weird clues are good. A theory that explains a smell of lilacs, a forged alibi and a missing dog in one story is the fun of this. Every clue it uses makes the roll better.",
    "steps": [
     {
      "t": "Open the case",
      "m": "ss/open_a_case",
-     "x": "Name it (\"Who's poisoning the projects' water?\") and rank it, usually Dangerous or Formidable. Tie it to a vow; if there isn't one, Swear an Iron Vow too. Add a track of type case. Roll one Clue to start."
+     "x": "Name it (\"Who's poisoning the projects' water?\") and set its complexity: Dangerous (1) is a good default, Formidable (2) for something big. Tie it to a vow, or Swear an Iron Vow. On the Tracks tab, add a track and set its type to case. Tap \"+ Clue prompt\" for a starting clue and \"+ Suspect\" once or twice."
+    },
+    {
+     "t": "Remember: nobody knows the answer",
+     "m": null,
+     "x": "Not you, not your partner, not the app. Don't decide who did it. Clues are just interesting facts. The truth is whatever theory you two prove later."
     },
     {
      "t": "Follow a lead",
      "m": "ss/work_the_case",
-     "x": "Each Work the Case is one lead: a crime scene (+wits), a witness (+heart), shaking down a fence (+iron), tailing a suspect (+shadow), racing to a scene (+edge). Strong hit: mark progress and roll a Clue. Weak hit: same, plus a cost. Miss: the lead goes cold; on a match it was a false lead planted on purpose."
+     "x": "Each Work the Case is one lead: a crime scene (+wits), a witness (+heart), shaking down a fence (+iron), tailing someone (+shadow), racing to a scene (+edge). Strong hit: add a clue and +1 momentum. Weak hit: add a clue plus a cost. Miss: Pay the Price; on a match someone got there first, so cross off a clue."
     },
     {
-     "t": "Let the clues shape the next lead",
+     "t": "Turn the prompt into a clue",
      "m": null,
-     "x": "Every clue points somewhere. \"A matchbook from a specific place\" means the next lead is that bar. Investigator and Journalist assets add bonuses here, and Enhanced Senses helps too."
+     "x": "A prompt like \"A key, code or access card. Old, from years ago. Points toward: a hidden past.\" becomes one concrete line you write on the case: \"a 1998 employee badge from the water treatment plant, in the victim's glovebox.\" Keep it specific, but don't explain it. Tap Twist when you want it messier."
     },
     {
-     "t": "Solve the Case",
-     "m": "ss/solve_the_case",
-     "x": "With five or six boxes filled, roll Solve the Case. Strong hit: you know who, how and where; Reach a Milestone on the vow, take +2 momentum, and the confrontation drops a rank. Weak hit: you know who, but they know you're coming. Miss: accuse the wrong person (+2 Heat) or keep digging."
+     "t": "Let clues pick the next lead",
+     "m": null,
+     "x": "Each clue suggests somewhere to go. The badge means the next lead is the treatment plant, or someone who worked there in 1998. Investigator, Journalist and Enhanced Senses all help here."
+    },
+    {
+     "t": "Build a theory",
+     "m": null,
+     "x": "When you have four or more clues, talk it through: who did it, why and how, using as many clues as you can. Tick each clue your theory explains. Stuck? \"Ideas from the AI\" offers three possible theories, but you two choose."
+    },
+    {
+     "t": "Theorize",
+     "m": "ss/theorize",
+     "x": "Your score is the clues used minus complexity. Five clues on a Dangerous case is a 4, seven clues is a 6. Strong hit: your theory is the truth, Reach a Milestone, +2 momentum, and the confrontation drops a rank. Weak hit: true, but they know you're coming, one detail is wrong, or you can't prove it yet. Miss: you're wrong; Pay the Price (+2 Heat if you accused someone) and find a new clue before trying again."
     },
     {
      "t": "Confront them",
@@ -194,7 +209,7 @@
     {
      "t": "Turn it into progress",
      "m": "ss/work_the_case",
-     "x": "If this is part of a case, it can be a Work the Case +iron (shaking someone down) instead of a Compel, so it marks case progress directly. Pick one move, not both."
+     "x": "If this is part of a case, make it a Work the Case +iron (shaking someone down) instead of a Compel, so a hit adds a clue to the case. Their answer is the clue: roll the prompt and make it what they let slip. Pick one move, not both."
     }
    ]
   },

@@ -67,6 +67,15 @@ export function rollOracle(table, byId, depth = 0, forced) {
   const row = table.rows.find(r => roll >= r[0] && roll <= r[1]);
   let text = row ? row[2] : '?';
   const chain = [{ table: table.name, roll }];
+  // "Roll twice" rows: roll two more results on the same table (rerolling any further "Roll twice").
+  if (/^roll twice$/i.test(text) && depth < 4) {
+    const parts = [];
+    for (let guard = 0; parts.length < 2 && guard < 20; guard++) {
+      const sub = rollOracle(table, byId, depth + 1);
+      if (!/^roll twice$/i.test(sub.text)) { parts.push(sub.text); chain.push(...sub.chain); }
+    }
+    return { text: parts.join(' + '), chain };
+  }
   if (text.startsWith('@') && depth < 4) {
     const next = byId[text.slice(1)];
     if (next) {

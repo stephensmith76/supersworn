@@ -16,10 +16,18 @@ Supersworn is a hack of Ironsworn: Starforged for street-level masked heroes in 
 - Flight, Invisibility, Biokinesis, Telekinesis and Clairvoyance are villain-only.
 - Healing Factor, Super-Strength, Toughness and Enhanced Senses use their street versions.
 
+## Cases (Brindlewood Bay style)
+- Cases have no fixed solution. Nobody knows who did it, including the players and the app. The truth is whatever theory the players prove.
+- Open a Case: name it, set complexity (Troublesome 0, Dangerous 1, Formidable 2, Extreme 3, Epic 4), tie it to a vow, start with one clue and optionally suspects.
+- Work the Case: strong hit adds a clue and +1 momentum; weak hit adds a clue plus a cost (suffer -1, +1 Heat, or advance a Nemesis scheme); miss is Pay the Price, and on a match one unused clue is crossed off.
+- Clues come from prompts (what it is, how it shows up, what it points toward, optional twist). Players turn each into one concrete line without deciding its meaning.
+- Theorize replaces Solve the Case: agree on who, why and how, mark the clues it explains, then a progress roll with score = clues used minus complexity (max 10). Strong: true, Reach a Milestone on the vow, +2 momentum, confrontation drops a rank. Weak: true and Reach a Milestone, but choose one: they know you're coming, one detail is wrong, or you can't prove it. Miss: wrong, Pay the Price, +2 Heat and an innocent pays if you went public; no new Theorize on that case until a new clue is added.
+- Investigator: Crime scene rolls two clue prompts on a strong hit and picks one; Read the room adds a clue on a strong hit with a match; The whole picture rerolls one challenge die once per case when you Theorize.
+
 ## Foes
 - Thugs: Troublesome as a group. Two or three unarmed thugs need no roll.
 - Pros (hitmen, enforcers, private security): Dangerous.
-- Bosses (crime family heads, corrupt officials): Formidable. Usually beaten with a Case, not a fight.
+- Bosses (crime family heads, corrupt officials): Formidable. Usually beaten by solving a case, not a fight.
 - Villains (costumed criminals): Extreme. Drop one rank after exploiting a weakness or choosing the ground.
 - A Boss or Villain who escapes, survives a fight you won on a weak hit, or is locked up becomes a Nemesis with a rank, a scheme clock (6 segments for a Boss, 8 for a Villain) and a status.
 - A Nemesis can also be a Connection. When you fight or confront one, add +1 per full box on that connection's progress track (max +3).
