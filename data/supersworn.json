@@ -130,7 +130,7 @@
    "roll": "no_roll",
    "stats": [],
    "oracles": [],
-   "text": "Cases have no fixed solution. Nobody knows who did it, including the app. You collect clues, then propose a theory that explains them. If the dice back you up, your theory is the truth.\n\nWhen you __commit to solving a crime or untangling a plot__, name the case and set its complexity: Troublesome (0), Dangerous (1), Formidable (2), Extreme (3) or Epic (4). Usually a case supports an iron vow, so tie it to one, or Swear an Iron Vow too. Start with one clue (roll a clue prompt) and, if you like, a suspect or two."
+   "text": "Cases have no fixed solution. Nobody knows who did it, not even the players. You collect clues, then propose a theory that explains them. If the dice back you up, your theory is the truth.\n\nWhen you __commit to solving a crime or untangling a plot__, name the case and set its complexity: Troublesome (0), Dangerous (1), Formidable (2), Extreme (3) or Epic (4). Usually a case supports an iron vow, so tie it to one, or Swear an Iron Vow too. Start with one clue (roll a clue prompt) and, if you like, a suspect or two."
   },
   {
    "id": "ss/work_the_case",
@@ -181,7 +181,7 @@
    "name": "Heat",
    "roll": "no_roll",
    "stats": [],
-   "text": "Heat (0 to 5, per hero) is how hard the law and the press are looking for you.\n\n__Gain Heat__ (+1 unless noted):\n\n  * a miss on Compel, or on any move involving police or officials\n  * you're seen on camera, or a witness gets a good look at you\n  * you use lethal force, or break into a public building\n  * Bloodthirsty triggers, or you take the brutal-kill option (+2)\n  * a scheme clock fills while you were known to be on the case\n\n__Lose Heat__ (-1):\n\n  * a strong hit on Finish Patrol\n  * you lie low for a session, or a press or police Connection covers for you\n  * you hand evidence to an honest cop instead of acting on it yourself\n\n__Effects__\n\n  * 0-1: Rumors only.\n  * 2-3: Your description is in the papers. Vigilante's police ability stops working. On a weak hit with Go On Patrol, police are on the scene.\n  * 4: Task force. Every patrol miss includes cops. Secret Identity rolls take -1.\n  * 5: Manhunt. Face Danger +shadow or your HQ is raided. Then drop Heat to 3."
+   "text": "Heat (0 to 5, per hero) is how hard the law and the press are looking for you.\n\n__Gain Heat__ (+1 unless noted):\n\n  * a miss on Compel, or on any move involving police or officials\n  * you're seen on camera, or a witness gets a good look at you\n  * you use lethal force, or break into a public building\n  * Bloodthirsty triggers, or you take the brutal-kill option (+2)\n  * a scheme clock fills while you were known to be on the case\n  * you act on a wrong theory in public (+2)\n\n__Lose Heat__ (-1):\n\n  * a strong hit on Finish Patrol\n  * you lie low for a session, or a press or police Connection covers for you\n  * you hand evidence to an honest cop instead of acting on it yourself\n\n__Effects__\n\n  * 0-1: Rumors only.\n  * 2-3: Your description is in the papers. Vigilante's police ability stops working. On a weak hit with Go On Patrol, police are on the scene.\n  * 4: Task force. Every patrol miss includes cops. Secret Identity rolls take -1.\n  * 5: Manhunt. Face Danger +shadow or your HQ is raided. Then drop Heat to 3."
   },
   {
    "id": "ss/rescues",
